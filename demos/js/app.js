@@ -94,6 +94,7 @@ function connect() {
 	});
 
 	//easyrtc.connect('easyrtc.dataFileTransfer', loginSuccess, loginFailure);
+	alert("burdasin");
 	easyrtc.easyApp('easyrtc.dataFileTransfer', 'selfVideo', ['callerVideo'], loginSuccess, loginFailure);
 }
 
@@ -354,7 +355,7 @@ function loginSuccess(easyrtcid) {
 	easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
 
 	// bu kısımda masaüstü kullanıcımızın görüntüsünün karşıya gitmesi engelleniyor.
-	if (navigator.userAgent.indexOf('Windows') != -1) {
+	/*if (navigator.userAgent.indexOf('Windows') != -1) {
 		const mediaSource = new MediaStream();
 		// Older browsers may not have srcObject
 
@@ -376,8 +377,8 @@ function loginSuccess(easyrtcid) {
 		selfVid.css({
 			"width": "100%"
 		});*/
-		//$('#selfVideo').width('100%');
-	}
+	//$('#selfVideo').width('100%');
+}*/
 }
 
 function loginFailure(errorCode, message) {
@@ -434,11 +435,9 @@ function connectFailure(err) {
 function take_photo() {
 	const constraints = {
 		video: {
-			deviceId: cameraID ?
-				{
-					exact: cameraID
-				} :
-				undefined
+			deviceId: cameraID ? {
+				exact: cameraID
+			} : undefined
 		}
 	};
 	navigator.mediaDevices
