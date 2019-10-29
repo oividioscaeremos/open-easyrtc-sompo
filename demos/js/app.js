@@ -94,7 +94,6 @@ function connect() {
 	});
 
 	//easyrtc.connect('easyrtc.dataFileTransfer', loginSuccess, loginFailure);
-	alert("burdasin");
 	easyrtc.easyApp('easyrtc.dataFileTransfer', 'selfVideo', ['callerVideo'], loginSuccess, loginFailure);
 }
 
@@ -373,10 +372,10 @@ function loginSuccess(easyrtcid) {
 			left: '-9999999px'
 		});
 	} else {
-		/*let selfVid = document.getElementById("selfVideo");
+		let selfVid = document.getElementById("selfVideo");
 		selfVid.css({
 			"width": "100%"
-		});*/
+		});
 	//$('#selfVideo').width('100%');
 }*/
 }
