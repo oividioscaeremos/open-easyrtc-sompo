@@ -98,6 +98,10 @@ function connect() {
 	easyrtc.easyApp('easyrtc.dataFileTransfer', 'selfVideo', ['callerVideo'], loginSuccess, loginFailure);
 }
 
+function disconnect() {
+	easyrtc.hangupAll();
+}
+
 function removeIfPresent(parent, childname) {
 	var item = document.getElementById(childname);
 	if (item) {
@@ -108,7 +112,6 @@ function removeIfPresent(parent, childname) {
 }
 
 function performCall(othereasyrtcid) {
-	alert('easyrtcid => {' + othereasyrtcid + '}');
 	easyrtc.hangupAll();
 	if (theirID == '') {
 		//sleep(1000);
@@ -119,13 +122,8 @@ function performCall(othereasyrtcid) {
 			easyrtc.showError('CALL-REJECTED', 'Sorry, your call to ' + easyrtc.idToName(caller) + ' was rejected');
 		}
 	};
-	var successCB = function () {
-		alert('success');
-	};
-	var failureCB = function () {
-		alert('err');
-		performCall(othereasyrtcid);
-	};
+	var successCB = function () {};
+	var failureCB = function () {};
 	easyrtc.call(othereasyrtcid, successCB, failureCB, acceptedCB);
 }
 
@@ -213,7 +211,6 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 			let filesList = new Array(File);
 			filesList.areBinary = true;
 			filesList[0] = blobToFile(bloby);
-			alert(bloby);
 			filesHandler(filesList);
 		});
 
@@ -351,7 +348,6 @@ function blobAcceptor(otherGuy, blob, filename) {
 }
 
 function loginSuccess(easyrtcid) {
-	alert('bizimki' + easyrtcid);
 	selfEasyrtcid = easyrtcid;
 	easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
 
@@ -388,38 +384,28 @@ function loginFailure(errorCode, message) {
 
 // Aşağıdaki kodlar telefonu tutan kişinin arka kamerasıyla fotoğraf çekebilmesi ve görüntülü konuşmada kamera değiştirilebilmesi içindir;
 
-function changeCamera(currentCameraState) {
-	alert(currentCameraState);
-	if (currentCameraState == 'front') {
-		if (backCameraID == null || backCameraID == undefined || backCameraID == '') {
-			return;
-		}
+function changeCamera(curr) {
+	alert('bu mudur' + curr);
+	/*if (curr == 'front') {
 		easyrtc.setVideoSource(backCameraID);
 		easyrtc.initMediaSource(function () {
 			var selfVideo = document.getElementById('selfVideo');
 			easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
-			document
-				.getElementById('change-camera-source')
-				.setAttribute('onClick', 'javascript : changeCamera("back")');
+			currentCameraState = 'back';
 			performCall(theirID);
 		}, connectFailure);
 		break;
 	} else {
-		if (frontCameraID == null || frontCameraID == undefined || frontCameraID == '') {
-			return;
-		}
 		easyrtc.setVideoSource(frontCameraID);
 		easyrtc.initMediaSource(function () {
 			var selfVideo = document.getElementById('selfVideo');
 			easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
-			document
-				.getElementById('change-camera-source')
-				.setAttribute('onClick', 'javascript : changeCamera("back")');
+			currentCameraState = 'front';
 			performCall(theirID);
 		}, connectFailure);
 		break;
-	}
-	/*if (currentCameraState == 'front') {
+	}*/
+	if (currentCameraState == 'front') {
 		easyrtc.getVideoSourceList(function (list) {
 			var i;
 			for (i = 0; i < list.length; i++) {
@@ -428,9 +414,7 @@ function changeCamera(currentCameraState) {
 					easyrtc.initMediaSource(function () {
 						var selfVideo = document.getElementById('selfVideo');
 						easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
-						document
-							.getElementById('change-camera-source')
-							.setAttribute('onClick', 'javascript : changeCamera("back")');
+						currentCameraState = 'back';
 						performCall(theirID);
 					}, connectFailure);
 					break;
@@ -446,16 +430,14 @@ function changeCamera(currentCameraState) {
 					easyrtc.initMediaSource(function () {
 						var selfVideo = document.getElementById('selfVideo');
 						easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
-						document
-							.getElementById('change-camera-source')
-							.setAttribute('onClick', 'javascript : changeCamera("front")');
+						currentCameraState = 'front';
 						performCall(theirID);
 					}, connectFailure);
 					break;
 				}
 			}
 		});
-	}*/
+	}
 }
 
 function connectFailure(err) {
