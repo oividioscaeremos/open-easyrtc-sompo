@@ -88,7 +88,10 @@
 
         let ourID = "";
         let theirID = "";
-        const frontMediaStreamTrack, backMediaStreamTrack, backCameraID, frontCameraID;
+        const frontMediaStreamTrack = new MediaStreamTrack(),
+            backMediaStreamTrack = new MediaStreamTrack(),
+            backCameraID = '',
+            frontCameraID = '';
         // Get the modal
         var modal = document.getElementById("myModal");
 

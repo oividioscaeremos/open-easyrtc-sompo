@@ -390,7 +390,7 @@ function loginFailure(errorCode, message) {
 function changeCamera(currentCameraState) {
 	alert(currentCameraState);
 	if (currentCameraState == 'front') {
-		if (backCameraID == null || backCameraID == undefined) {
+		if (backCameraID == null || backCameraID == undefined || backCameraID == '') {
 			return;
 		}
 		easyrtc.setVideoSource(backCameraID);
@@ -404,7 +404,7 @@ function changeCamera(currentCameraState) {
 		}, connectFailure);
 		break;
 	} else {
-		if (frontCameraID == null || frontCameraID == undefined) {
+		if (frontCameraID == null || frontCameraID == undefined || frontCameraID == '') {
 			return;
 		}
 		easyrtc.setVideoSource(frontCameraID);
@@ -477,7 +477,7 @@ function take_photo() {
 }
 
 function gotMedia(mediaStream) {
-	if (mediaStream == null || mediaStream == undefined) {
+	if (mediaStream.getVideoTracks()[0] == null || mediaStream.getVideoTracks()[0] == undefined) {
 		return;
 	}
 	const mediaStreamTrack = mediaStream.getVideoTracks()[0];
