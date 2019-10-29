@@ -1,1 +1,1 @@
-web: node server_example/server_ssl.js
+web: node server_example/server.js
