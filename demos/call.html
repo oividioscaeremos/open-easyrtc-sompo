@@ -83,7 +83,9 @@
                 document.getElementById("startRecording").style.display = "none";
                 document.getElementById("stopRecording").style.display = "none";
             }
-            modal_PhotoTaker();
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                modal_PhotoTaker();
+            }
         });
 
         let ourID = "";
