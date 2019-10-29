@@ -83,8 +83,13 @@
                 document.getElementById("startRecording").style.display = "none";
                 document.getElementById("stopRecording").style.display = "none";
             }
+
+            const constraints = {
+                video: true,
+                audio: true
+            };
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia().then(function (stream) {
+                navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
                     modal_PhotoTaker();
                     //video.src = window.URL.createObjectURL(stream);
                     /*video.srcObject = stream;
