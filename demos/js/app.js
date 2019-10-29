@@ -477,7 +477,7 @@ function take_photo() {
 }
 
 function gotMedia(mediaStream) {
-	if (mediaStream.getVideoTracks()[0] == null || mediaStream.getVideoTracks()[0] == undefined) {
+	if (mediaStream == null || mediaStream == undefined) {
 		return;
 	}
 	const mediaStreamTrack = mediaStream.getVideoTracks()[0];
