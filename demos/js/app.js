@@ -33,6 +33,7 @@ var fileInput,
 	fileNames = new Array('');
 var supportsRecording = easyrtc.supportsRecording();
 
+
 function buildPeerBlockName(easyrtcid) {
 	return 'peerzone_' + easyrtcid;
 }
@@ -389,6 +390,35 @@ function loginFailure(errorCode, message) {
 function changeCamera(currentCameraState) {
 	alert(currentCameraState);
 	if (currentCameraState == 'front') {
+		if (backCameraID == null || backCameraID == undefined) {
+			return;
+		}
+		easyrtc.setVideoSource(backCameraID);
+		easyrtc.initMediaSource(function () {
+			var selfVideo = document.getElementById('selfVideo');
+			easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
+			document
+				.getElementById('change-camera-source')
+				.setAttribute('onClick', 'javascript : changeCamera("back")');
+			performCall(theirID);
+		}, connectFailure);
+		break;
+	} else {
+		if (frontCameraID == null || frontCameraID == undefined) {
+			return;
+		}
+		easyrtc.setVideoSource(frontCameraID);
+		easyrtc.initMediaSource(function () {
+			var selfVideo = document.getElementById('selfVideo');
+			easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
+			document
+				.getElementById('change-camera-source')
+				.setAttribute('onClick', 'javascript : changeCamera("back")');
+			performCall(theirID);
+		}, connectFailure);
+		break;
+	}
+	/*if (currentCameraState == 'front') {
 		easyrtc.getVideoSourceList(function (list) {
 			var i;
 			for (i = 0; i < list.length; i++) {
@@ -424,7 +454,7 @@ function changeCamera(currentCameraState) {
 				}
 			}
 		});
-	}
+	}*/
 }
 
 function connectFailure(err) {
@@ -432,7 +462,7 @@ function connectFailure(err) {
 }
 
 function take_photo() {
-	const constraints = {
+	/*const constraints = {
 		video: {
 			deviceId: cameraID ? {
 				exact: cameraID
@@ -442,10 +472,14 @@ function take_photo() {
 	navigator.mediaDevices
 		.getUserMedia(constraints)
 		.then(gotMedia)
-		.catch((error) => console.error('getUserMedia() error:', error));
+		.catch((error) => console.error('getUserMedia() error:', error));*/
+	gotMedia(backMediaStreamTrack);
 }
 
 function gotMedia(mediaStream) {
+	if (mediaStream == null || mediaStream == undefined) {
+		return;
+	}
 	const mediaStreamTrack = mediaStream.getVideoTracks()[0];
 	const imageCapture = new ImageCapture(mediaStreamTrack);
 	const img = document.createElement('img');

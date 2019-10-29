@@ -88,7 +88,7 @@
 
         let ourID = "";
         let theirID = "";
-        let cameraID = "";
+        const frontMediaStreamTrack, backMediaStreamTrack, backCameraID, frontCameraID;
         // Get the modal
         var modal = document.getElementById("myModal");
 
@@ -128,6 +128,7 @@
                         if (list[i].label.indexOf('back') > 0) {
                             alert("found!");
                             cameraID = list[i].deviceId;
+                            backCameraID = list[i].deviceId;
                             const constraints = {
                                 video: {
                                     deviceId: cameraID ? {
@@ -139,11 +140,13 @@
                             navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
                                 //video.src = window.URL.createObjectURL(stream);
                                 video.srcObject = stream;
+                                backMediaStreamTrack = stream;
                                 video.play();
                             });
                             break;
                         } else {
                             cameraID = list[i].deviceId;
+                            frontCameraID = list[i].deviceId;
                             const constraints = {
                                 video: {
                                     width: 720,
@@ -157,6 +160,7 @@
                             navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
                                 //video.src = window.URL.createObjectURL(stream);
                                 video.srcObject = stream;
+                                frontMediaStreamTrack = stream;
                                 video.play();
                             });
                         }
