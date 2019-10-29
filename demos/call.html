@@ -84,7 +84,14 @@
                 document.getElementById("stopRecording").style.display = "none";
             }
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                modal_PhotoTaker();
+                navigator.mediaDevices.getUserMedia().then(function (stream) {
+                    modal_PhotoTaker();
+                    //video.src = window.URL.createObjectURL(stream);
+                    /*video.srcObject = stream;
+                    alert('alert2;' + constraints.video.deviceId);
+                    frontMediaStreamTrack = stream;
+                    video.play();*/
+                });
             }
         });
 
