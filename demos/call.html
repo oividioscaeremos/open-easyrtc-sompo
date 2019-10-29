@@ -128,6 +128,7 @@
                 easyrtc.getVideoSourceList(function (list) {
                     var i;
                     for (i = 0; i < list.length; i++) {
+                        alert('alert1;' + list[i].label);
                         if (list[i].label.indexOf('back') > 0) {
                             alert("found!");
                             cameraID = list[i].deviceId;
@@ -163,6 +164,7 @@
                             navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
                                 //video.src = window.URL.createObjectURL(stream);
                                 video.srcObject = stream;
+                                alert('alert2;' + constraints.video.deviceId);
                                 frontMediaStreamTrack = stream;
                                 video.play();
                             });
