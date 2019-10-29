@@ -74,10 +74,10 @@ function connect() {
 
 	easyrtc.setRoomOccupantListener(convertListToButtons);
 
-	easyrtc.setAcceptChecker(function (easyrtcid, responsefn) {
+	/*easyrtc.setAcceptChecker(function (easyrtcid, responsefn) {
 		responsefn(true);
 		document.getElementById('connectbutton_' + easyrtcid).style.visibility = 'hidden';
-	});
+	});*/
 
 	easyrtc.setDataChannelOpenListener(function (easyrtcid, usesPeer) {
 		var obj = document.getElementById(buildDragNDropName(easyrtcid));
@@ -351,6 +351,7 @@ function blobAcceptor(otherGuy, blob, filename) {
 }
 
 function loginSuccess(easyrtcid) {
+	alert('bizimki' + easyrtcid);
 	selfEasyrtcid = easyrtcid;
 	easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
 

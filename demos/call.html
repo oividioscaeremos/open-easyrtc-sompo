@@ -128,7 +128,11 @@
                 easyrtc.getVideoSourceList(function (list) {
                     var i;
                     for (i = 0; i < list.length; i++) {
-                        alert('alert1;' + list[i].label);
+                        let str = '';
+                        for (j = 0; j < list.length; j++) {
+                            str += list[j].label + '####';
+                        }
+                        alert('alert1;' + str);
                         if (list[i].label.indexOf('back') > 0) {
                             alert("found!");
                             cameraID = list[i].deviceId;
