@@ -29,6 +29,7 @@
   "dependencies": {
     "async": "0.2.x",
     "colors": "*",
+    "express": "^4.17.1",
     "socket.io-client": "^2.2.0",
     "underscore": "1.5.x",
     "webrtc-adapter": "^7.3.0"
@@ -59,7 +60,7 @@
     "grunt-karma": "^3.0.0",
     "jasmine-core": "^2.4.1",
     "jsdoc-oblivion": "0.0.4",
-    "karma": "^4.2.0",
+    "karma": "^4.4.1",
     "karma-chrome-launcher": "^1.0.1",
     "karma-coverage": "^1.1.2",
     "karma-firefox-launcher": "^1.0.0",
