@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sompo Sigorta - Canlı Destek</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/call.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="../easyrtc/easyrtc.js"></script>
+    <script type="text/javascript" src="../easyrtc/easyrtc_ft.js"></script>
+    <script type="text/javascript" src="../easyrtc/labs/easyrtc_recorder.js"></script>
+
+
+
+</head>
+
+<body onload="connect()">
+
+    <div id="peerZone" style="width: 100%; height: 20%; margin-top: 0px;">
+    </div>
+    <div id="recordings">
+        <a id="selfDownloadLink"></a>
+        <a id="callerDownloadLink"></a>
+    </div>
+    <div id="seperator"><br><br></div>
+
+    <div class="container" style="width:100%; height:80%; margin-bottom: 0px;">
+        <div class="row md-center" id="cameras">
+            <video autoplay="autoplay" playsinline="playsinline" id="selfVideo" class="easyrtcMirror"
+                volume="0"></video>
+            <video autoplay="autoplay" playsinline="playsinline" id="callerVideo" muted></video>
+        </div>
+        <button id="start-call" class="col" onclick="performCall(theirID);" disabled>ARAMAYI BAŞLAT</button>
+        <button id="end-call" class="col" onclick="disconnect();">ARAMAYI BİTİR</button>
+        <button id="startRecording" class="col" onclick="startRecording();">KAYDI BAŞLAT</button>
+        <button id="stopRecording" class="col" onclick="endRecording();">KAYDI BİTİR</button>
+        <button id="change-camera-source" class="col" onclick="changeCamera(currentCameraState);">KAMERAYI
+            DEĞİŞTİR</button>
+        <!-- Trigger/Open The Modal -->
+        <button id="myBtn" class="col">Fotoğraf Çek</button>
+        <!-- The Modal -->
+        <div id="myModal" class="modal" style="z-index: 99;">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <h4>Sompo Sigorta - Canlı Destek</h4>
+                </div>
+                <div class="modal-body">
+                    <video id="video" width="100%" height="auto" style="margin: 0 auto; width: 100%; height: auto;"
+                        autoplay></video>
+                    <div><button id='take-a-photo' onclick="take_photo()">Fotoğraf Çek</button></div>
+
+                </div>
+                <div class="modal-footer">
+                    <h3></h3>
+                </div>
+            </div>
+        </div>
+        <!-- The Modal End -->
+    </div>
+
+    <div id="otherClients"></div>
+    </div>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
+    <script src="js/app.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            if (navigator.userAgent.indexOf("Windows") != -1) {
+                $("#myBtn").css({
+                    "visibility": "hidden"
+                });
+                $("#change-camera-source").css({
+                    "visibility": "hidden"
+                });
+            } else {
+                document.getElementById("startRecording").style.display = "none";
+                document.getElementById("stopRecording").style.display = "none";
+            }
+            modal_PhotoTaker();
+        });
+
+        let ourID = "";
+        let theirID = "";
+        let cameraID = "";
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("myBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal 
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function modal_PhotoTaker() {
+            // camera usage
+            // Grab elements, create settings, etc.
+            var video = document.getElementById('video');
+
+            // Get access to the camera!
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                easyrtc.getVideoSourceList(function (list) {
+                    var i;
+                    for (i = 0; i < list.length; i++) {
+                        if (list[i].label.indexOf('back') > 0) {
+                            alert("found!");
+                            cameraID = list[i].deviceId;
+                            const constraints = {
+                                video: {
+                                    deviceId: cameraID ? {
+                                        exact: cameraID
+                                    } : undefined
+                                },
+                                audio: undefined
+                            };
+                            navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+                                //video.src = window.URL.createObjectURL(stream);
+                                video.srcObject = stream;
+                                video.play();
+                            });
+                            break;
+                        } else {
+                            cameraID = list[i].deviceId;
+                            const constraints = {
+                                video: {
+                                    width: 720,
+                                    height: 1080,
+                                    deviceId: cameraID ? {
+                                        exact: cameraID
+                                    } : undefined
+                                },
+                                audio: undefined
+                            };
+                            navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+                                //video.src = window.URL.createObjectURL(stream);
+                                video.srcObject = stream;
+                                video.play();
+                            });
+                        }
+                    }
+                });
+
+            }
+        }
+    </script>
+
+    <script src="js/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
+</body>
+
+</html>
