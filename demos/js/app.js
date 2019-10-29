@@ -73,12 +73,12 @@ function connect() {
 
 	easyrtc.setRoomOccupantListener(convertListToButtons);
 
-	easyrtc.setAcceptChecker(function(easyrtcid, responsefn) {
+	easyrtc.setAcceptChecker(function (easyrtcid, responsefn) {
 		responsefn(true);
 		document.getElementById('connectbutton_' + easyrtcid).style.visibility = 'hidden';
 	});
 
-	easyrtc.setDataChannelOpenListener(function(easyrtcid, usesPeer) {
+	easyrtc.setDataChannelOpenListener(function (easyrtcid, usesPeer) {
 		var obj = document.getElementById(buildDragNDropName(easyrtcid));
 		console.log(buildDragNDropName(easyrtcid));
 		if (!obj) {
@@ -88,13 +88,13 @@ function connect() {
 		jQuery(obj).removeClass('notConnected');
 	});
 
-	easyrtc.setDataChannelCloseListener(function(easyrtcid) {
+	easyrtc.setDataChannelCloseListener(function (easyrtcid) {
 		jQuery(buildDragNDropName(easyrtcid)).addClass('notConnected');
 		jQuery(buildDragNDropName(easyrtcid)).removeClass('connected');
 	});
 
 	//easyrtc.connect('easyrtc.dataFileTransfer', loginSuccess, loginFailure);
-	easyrtc.easyApp('easyrtc.dataFileTransfer', 'selfVideo', [ 'callerVideo' ], loginSuccess, loginFailure);
+	easyrtc.easyApp('easyrtc.dataFileTransfer', 'selfVideo', ['callerVideo'], loginSuccess, loginFailure);
 }
 
 function removeIfPresent(parent, childname) {
@@ -113,15 +113,15 @@ function performCall(othereasyrtcid) {
 		//sleep(1000);
 		theirID = othereasyrtcid;
 	}
-	var acceptedCB = function(accepted, caller) {
+	var acceptedCB = function (accepted, caller) {
 		if (!accepted) {
 			easyrtc.showError('CALL-REJECTED', 'Sorry, your call to ' + easyrtc.idToName(caller) + ' was rejected');
 		}
 	};
-	var successCB = function() {
+	var successCB = function () {
 		alert('success');
 	};
-	var failureCB = function() {
+	var failureCB = function () {
 		alert('err');
 		performCall(othereasyrtcid);
 	};
@@ -164,13 +164,13 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 					break;
 				case 'rejected':
 					statusDiv.innerHTML = 'cancelled';
-					setTimeout(function() {
+					setTimeout(function () {
 						statusDiv.innerHTML = '';
 					}, 2000);
 					break;
 				case 'done':
 					statusDiv.innerHTML = 'done';
-					setTimeout(function() {
+					setTimeout(function () {
 						statusDiv.innerHTML = '';
 					}, 3000);
 					break;
@@ -195,7 +195,7 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 				if (!fileSender) {
 					fileSender = easyrtc_ft.buildFileSender(easyrtcid, updateStatusDiv);
 				}
-				fileSender(files, true /* assume binary */);
+				fileSender(files, true /* assume binary */ );
 			} else {
 				easyrtc.showError('user-error', 'Wait for the connection to complete before adding more files!');
 			}
@@ -208,7 +208,7 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 		//	filesHandler(fileInput.files);
 		//});
 
-		$('#seperator').bind('DOMSubtreeModified', function(event) {
+		$('#seperator').bind('DOMSubtreeModified', function (event) {
 			let filesList = new Array(File);
 			filesList.areBinary = true;
 			filesList[0] = blobToFile(bloby);
@@ -240,10 +240,10 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 			var button = document.getElementById('start-call');
 			theirID = easyrtcid;
 			button.disabled = false;
-			button.onclick = (function(easyrtcid) {
-				return function() {
+			button.onclick = (function (easyrtcid) {
+				return function () {
 					performCall(easyrtcid);
-					easyrtc.setOnHangup(function(easyrtcid, slot) {
+					easyrtc.setOnHangup(function (easyrtcid, slot) {
 						document.getElementById('start-call').disabled = true;
 					});
 				};
@@ -315,7 +315,7 @@ function receiveStatusCB(otherGuy, msg) {
 			break;
 		case 'done':
 			receiveBlock.innerHTML = 'Stopped because ' + msg.reason;
-			setTimeout(function() {
+			setTimeout(function () {
 				receiveBlock.style.display = 'none';
 			}, 1000);
 			break;
@@ -376,7 +376,7 @@ function loginSuccess(easyrtcid) {
 		selfVid.css({
 			"width": "100%"
 		});*/
-		$('#selfVideo').width('100%');
+		//$('#selfVideo').width('100%');
 	}
 }
 
@@ -389,12 +389,12 @@ function loginFailure(errorCode, message) {
 function changeCamera(currentCameraState) {
 	alert(currentCameraState);
 	if (currentCameraState == 'front') {
-		easyrtc.getVideoSourceList(function(list) {
+		easyrtc.getVideoSourceList(function (list) {
 			var i;
 			for (i = 0; i < list.length; i++) {
 				if (list[i].label.indexOf('back') > 0) {
 					easyrtc.setVideoSource(list[i].id);
-					easyrtc.initMediaSource(function() {
+					easyrtc.initMediaSource(function () {
 						var selfVideo = document.getElementById('selfVideo');
 						easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
 						document
@@ -407,12 +407,12 @@ function changeCamera(currentCameraState) {
 			}
 		});
 	} else {
-		easyrtc.getVideoSourceList(function(list) {
+		easyrtc.getVideoSourceList(function (list) {
 			var i;
 			for (i = 0; i < list.length; i++) {
 				if (list[i].label.indexOf('front') > 0) {
 					easyrtc.setVideoSource(list[i].id);
-					easyrtc.initMediaSource(function() {
+					easyrtc.initMediaSource(function () {
 						var selfVideo = document.getElementById('selfVideo');
 						easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
 						document
@@ -434,11 +434,11 @@ function connectFailure(err) {
 function take_photo() {
 	const constraints = {
 		video: {
-			deviceId: cameraID
-				? {
-						exact: cameraID
-					}
-				: undefined
+			deviceId: cameraID ?
+				{
+					exact: cameraID
+				} :
+				undefined
 		}
 	};
 	navigator.mediaDevices
