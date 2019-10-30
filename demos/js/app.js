@@ -95,7 +95,7 @@ function connect() {
 	});
 
 	//easyrtc.connect('easyrtc.dataFileTransfer', loginSuccess, loginFailure);
-	easyrtc.easyApp('easyrtc.dataFileTransfer', 'selfVideo', ['callerVideo'], loginSuccess, loginFailure);
+	easyrtc.easyApp('easyrtc.audioVideoSimple', 'selfVideo', ['callerVideo'], loginSuccess, loginFailure);
 }
 
 function disconnect() {
@@ -123,7 +123,10 @@ function performCall(othereasyrtcid) {
 		}
 	};
 	var successCB = function () {};
-	var failureCB = function () {};
+	var failureCB = function (err) {
+		alert("failure " + err);
+
+	};
 	easyrtc.call(othereasyrtcid, successCB, failureCB, acceptedCB);
 }
 
@@ -348,6 +351,7 @@ function blobAcceptor(otherGuy, blob, filename) {
 }
 
 function loginSuccess(easyrtcid) {
+	alert("login successful");
 	selfEasyrtcid = easyrtcid;
 	easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
 
