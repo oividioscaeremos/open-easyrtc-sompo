@@ -65,9 +65,7 @@ function connect() {
 	if (navigator.userAgent.indexOf('Windows') == -1) {
 		$('start-call').css('visibility', 'hidden');
 	}
-	if (!supportsRecording) {
-		window.alert('This browser does not support recording. Try chrome or firefox.');
-	}
+
 	var otherClientsDiv = document.getElementById('otherClients');
 
 	easyrtc.enableDataChannels(true);
@@ -368,7 +366,9 @@ function loginSuccess(easyrtcid) {
 		tracks.forEach((t) => {
 			t.enabled = false;
 		});
-
+		$('#selfVideo').css({
+			left: '-9999999px'
+		});
 	}
 }
 
