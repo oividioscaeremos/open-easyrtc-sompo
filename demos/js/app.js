@@ -95,7 +95,7 @@ function connect() {
 	});
 
 	//easyrtc.connect('easyrtc.dataFileTransfer', loginSuccess, loginFailure);
-	easyrtc.easyApp('easyrtc.audioVideoSimple', 'selfVideo', ['callerVideo'], loginSuccess, loginFailure);
+	easyrtc.easyApp('easyrtc.dataFileTransfer', 'selfVideo', ['callerVideo'], loginSuccess, loginFailure);
 }
 
 function disconnect() {
@@ -113,10 +113,9 @@ function removeIfPresent(parent, childname) {
 
 function performCall(othereasyrtcid) {
 	easyrtc.hangupAll();
-	if (theirID == '') {
-		//sleep(1000);
-		theirID = othereasyrtcid;
-	}
+
+	theirID = othereasyrtcid;
+
 	var acceptedCB = function (accepted, caller) {
 		if (!accepted) {
 			easyrtc.showError('CALL-REJECTED', 'Sorry, your call to ' + easyrtc.idToName(caller) + ' was rejected');
@@ -125,8 +124,8 @@ function performCall(othereasyrtcid) {
 	var successCB = function () {};
 	var failureCB = function (err) {
 		alert("failure " + err);
-
 	};
+
 	easyrtc.call(othereasyrtcid, successCB, failureCB, acceptedCB);
 }
 
@@ -356,7 +355,7 @@ function loginSuccess(easyrtcid) {
 	easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
 
 	// bu kısımda masaüstü kullanıcımızın görüntüsünün karşıya gitmesi engelleniyor.
-	/*if (navigator.userAgent.indexOf('Windows') != -1) {
+	if (navigator.userAgent.indexOf('Windows') != -1) {
 		const mediaSource = new MediaStream();
 		// Older browsers may not have srcObject
 
@@ -370,16 +369,7 @@ function loginSuccess(easyrtcid) {
 			t.enabled = false;
 		});
 
-		$('#selfVideo').css({
-			left: '-9999999px'
-		});
-	} else {
-		let selfVid = document.getElementById("selfVideo");
-		selfVid.css({
-			"width": "100%"
-		});
-	//$('#selfVideo').width('100%');
-}*/
+	}
 }
 
 function loginFailure(errorCode, message) {
