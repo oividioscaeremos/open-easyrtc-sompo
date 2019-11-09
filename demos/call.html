@@ -30,9 +30,8 @@
 
     <div class="container" style="width:100%; height:80%; margin-bottom: 0px;">
         <div class="row md-center" id="cameras">
-            <video autoplay="autoplay" playsinline="playsinline" id="selfVideo" class="easyrtcMirror"
-                volume="0"></video>
-            <video autoplay="autoplay" playsinline="playsinline" id="callerVideo"></video>
+            <video autoplay="autoplay" playsinline="playsinline" id="selfVideo" class="easyrtcMirror" muted></video>
+            <video autoplay="autoplay" playsinline="playsinline" id="callerVideo" muted></video>
         </div>
         <button id="start-call" class="col" onclick="performCall(theirID);" disabled>ARAMAYI BAŞLAT</button>
         <button id="end-call" class="col" onclick="disconnect();">ARAMAYI BİTİR</button>
@@ -42,7 +41,7 @@
             DEĞİŞTİR</button>
         <!-- Trigger/Open The Modal -->
         <button id="myBtn" class="col">Fotoğraf Çek</button>
-        <!-- The Modal -->
+        <!-- Fotoğraf Çekmek İçin Kullanılacak Olan Modal (Mobil Tarafta)-->
         <div id="myModal" class="modal" style="z-index: 99;">
             <!-- Modal content -->
             <div class="modal-content">
@@ -61,7 +60,28 @@
                 </div>
             </div>
         </div>
-        <!-- The Modal End -->
+        <!-- Fotoğraf Çekmek İçin Kullanılacak Modal Sonu -->
+
+        <!-- Fotoğrafın düzenleneceği modal (Destek Tarafında)-->
+        <div id="touchUpModal" class="modal" style="z-index: 99;">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <h4>Sompo Sigorta - Canlı Destek</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="touchUpModalBody">
+                        <h1>Burada Foto ve zımbırtılar yer alacak.</h1>
+                        <img id="imageTouchUp" src="#" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <h3></h3>
+                </div>
+            </div>
+        </div>
+        <!-- Fotoğraf Düzenleme Modal Sonu -->
     </div>
 
     <div id="otherClients"></div>
@@ -79,7 +99,7 @@
             frontCameraID = '';
 
         $(document).ready(function () {
-            if (navigator.userAgent.indexOf("Windows") != -1) {
+            if (navigator.userAgent.indexOf("Windows") != -1 || navigator.userAgent.indexOf("Mac") != -1) {
                 $("#myBtn").css({
                     "visibility": "hidden"
                 });
@@ -100,6 +120,7 @@
                 video: true,
                 audio: true
             };
+
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
                     modal_PhotoTaker();
@@ -111,11 +132,13 @@
         // Get the modal
         var modal = document.getElementById("myModal");
 
+
         // Get the button that opens the modal
         var btn = document.getElementById("myBtn");
 
         // Get the <span> element that closes the modal
         var span = document.getElementsByClassName("close")[0];
+        var spanTouchUp = document.getElementsByClassName("close")[1];
 
         // When the user clicks the button, open the modal 
         btn.onclick = function () {
@@ -127,10 +150,16 @@
             modal.style.display = "none";
         }
 
+        spanTouchUp.onclick = function () {
+            touchUpModal.style.display = "none";
+        }
+
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function (event) {
             if (event.target == modal) {
                 modal.style.display = "none";
+            } else if (event.target == touchUpModal) {
+                touchUpModal.style.display = "none";
             }
         }
 
