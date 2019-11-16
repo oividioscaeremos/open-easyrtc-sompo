@@ -50,10 +50,8 @@
                     <h4>Sompo Sigorta - Canlı Destek</h4>
                 </div>
                 <div class="modal-body">
-                    <video id="video" width="100%" height="auto" style="margin: 0 auto; width: 100%; height: auto;"
-                        autoplay></video>
+                    <video id="video" style="margin: 0 auto; width: 100%; height: auto;" autoplay muted></video>
                     <div><button id='take-a-photo' onclick="take_photo()">Fotoğraf Çek</button></div>
-
                 </div>
                 <div class="modal-footer">
                     <h3></h3>
@@ -70,14 +68,19 @@
                     <span class="close">&times;</span>
                     <h4>Sompo Sigorta - Canlı Destek</h4>
                 </div>
-                <div class="modal-body">
-                    <div id="touchUpModalBody">
-                        <h1>Burada Foto ve zımbırtılar yer alacak.</h1>
-                        <img id="imageTouchUp" src="#" />
+                <div class="modal-body image" style="height: 75vh;">
+                    <div>
+                        <img src="http://www.ilkeratabay.com/wp-content/uploads/2019/11/eksi90derece.png" height="32"
+                            width="32" onclick="rotate('minus')" />
+                        <img src="http://www.ilkeratabay.com/wp-content/uploads/2019/11/90derece.png" height="32"
+                            width="32" onclick="rotate('plus')" />
+                    </div>
+                    <div>
+                        <img id="imageTouchUp" />
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <h3></h3>
+                    <h3>Footer</h3>
                 </div>
             </div>
         </div>
@@ -112,7 +115,7 @@
             }
 
             document.getElementById('change-camera-source').addEventListener('click', function () {
-                alert('merhaba dunyali' + currentCameraState);
+                //alert('merhaba dunyali' + currentCameraState);
                 changeCamera(currentCameraState);
             })
 
@@ -188,7 +191,9 @@
                             navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
                                 //video.src = window.URL.createObjectURL(stream);
                                 video.srcObject = stream;
-                                backMediaStreamTrack = stream;
+                                console.log("trackler bunlar");
+                                console.log(stream.getVideoTracks()[0]);
+                                backMediaStreamTrack = stream.getVideoTracks()[0];
                                 video.play();
                             });
                             break;
@@ -208,7 +213,7 @@
                             navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
                                 //video.src = window.URL.createObjectURL(stream);
                                 video.srcObject = stream;
-                                frontMediaStreamTrack = stream;
+                                frontMediaStreamTrack = stream.getVideoTracks()[0];
                                 video.play();
                             });
                         }
