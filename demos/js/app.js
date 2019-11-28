@@ -31,7 +31,7 @@ var bloby = new Blob();
 var fileSender = null;
 var fileInput,
 	fileNames = new Array('');
-var supportsRecording = easyrtc.supportsRecording();
+var supportsRecording;
 var touchUpModal = document.getElementById('touchUpModal');
 var drawer;
 
@@ -87,24 +87,13 @@ function closeNav() {
 /*SIDEBAR İÇİN FONKSİYONLAR */
 
 function connect() {
-	if (navigator.userAgent.indexOf('Windows') == -1) {
-		$('start-call').css('visibility', 'hidden');
-	}
-
-	var otherClientsDiv = document.getElementById('otherClients');
 
 	easyrtc.enableDataChannels(true);
 
 	easyrtc.setRoomOccupantListener(convertListToButtons);
 
-	/*easyrtc.setAcceptChecker(function (easyrtcid, responsefn) {
-		responsefn(true);
-		document.getElementById('connectbutton_' + easyrtcid).style.visibility = 'hidden';
-	});*/
-
 	easyrtc.setDataChannelOpenListener(function (easyrtcid, usesPeer) {
 		var obj = document.getElementById(buildDragNDropName(easyrtcid));
-		console.log(buildDragNDropName(easyrtcid));
 		if (!obj) {
 			console.log('no such object ');
 		}
@@ -539,9 +528,10 @@ function loginSuccess(easyrtcid) {
 	easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
 
 	// bu kısımda masaüstü kullanıcımızın görüntüsünün karşıya gitmesi engelleniyor.
-	if (navigator.userAgent.indexOf('Windows') != -1 || navigator.userAgent.indexOf('Mac') != -1) {
-		const mediaSource = new MediaStream();
-
+	alert(navigator.userAgent.indexOf('iPhone'));
+	if (navigator.userAgent.indexOf('Windows') != -1 || (navigator.userAgent.indexOf('Mac') != -1 && navigator.userAgent.indexOf('iPhone') == -1)) {
+		/*const mediaSource = new MediaStream();
+		alert("selam fıstık");
 		let stream = $('#selfVideo')[0].srcObject;
 		let tracks = $('#selfVideo')[0].srcObject.getVideoTracks();
 		tracks.forEach((t) => {
@@ -550,7 +540,7 @@ function loginSuccess(easyrtcid) {
 
 		$('#selfVideo').css({
 			left: '-9999999px'
-		});
+		});*/
 	} else {
 		$('#selfVideo').width("80%");
 		$('#selfVideo').height("auto");

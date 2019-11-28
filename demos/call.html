@@ -47,7 +47,7 @@
         <div class="container" style="width:100%; height:80%; margin-bottom: 0px;">
             <div class="row md-center" id="cameras">
                 <video autoplay="autoplay" playsinline="playsinline" id="selfVideo" class="easyrtcMirror" muted></video>
-                <video autoplay="autoplay" playsinline="playsinline" id="callerVideo" muted></video>
+                <video autoplay="autoplay" playsinline="playsinline" id="callerVideo"></video>
             </div>
             <div style="bottom: 0; position: absolute; margin: 0 auto;" class="row md-center">
                 <button id="start-call" class="col" onclick="performCall(theirID);" disabled>ARAMAYI BAŞLAT</button>
@@ -125,7 +125,8 @@
             frontCameraID = '';
 
         $(document).ready(function () {
-            if (navigator.userAgent.indexOf("Windows") != -1 || navigator.userAgent.indexOf("Mac") != -1) {
+            if (navigator.userAgent.indexOf("Windows") != -1 || (navigator.userAgent.indexOf('Mac') != -1 &&
+                    navigator.userAgent.indexOf('iPhone') == -1)) {
                 $("#myBtn").css({
                     "visibility": "hidden"
                 });
@@ -135,6 +136,14 @@
             } else {
                 document.getElementById("startRecording").style.display = "none";
                 document.getElementById("stopRecording").style.display = "none";
+            }
+            if (navigator.userAgent.indexOf("iPhone") != -1) {
+                $("#myBtn").css({
+                    "visibility": "visible"
+                });
+                $("#change-camera-source").css({
+                    "visibility": "visible"
+                });
             }
 
             document.getElementById('change-camera-source').addEventListener('click', function () {
@@ -213,10 +222,7 @@
                                 audio: undefined
                             };
                             navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-                                //video.src = window.URL.createObjectURL(stream);
                                 video.srcObject = stream;
-                                console.log("trackler bunlar");
-                                console.log(stream.getVideoTracks()[0]);
                                 backMediaStreamTrack = stream.getVideoTracks()[0];
                                 video.play();
                             });
@@ -235,7 +241,6 @@
                                 audio: undefined
                             };
                             navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-                                //video.src = window.URL.createObjectURL(stream);
                                 video.srcObject = stream;
                                 frontMediaStreamTrack = stream.getVideoTracks()[0];
                                 video.play();
