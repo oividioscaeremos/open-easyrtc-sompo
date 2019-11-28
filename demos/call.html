@@ -9,87 +9,110 @@
     <link rel="stylesheet" href="css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="css/call.css">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.5.95/css/materialdesignicons.min.css">
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="../easyrtc/easyrtc.js"></script>
     <script type="text/javascript" src="../easyrtc/easyrtc_ft.js"></script>
     <script type="text/javascript" src="../easyrtc/labs/easyrtc_recorder.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
+
 
 
 
 </head>
 
 <body onload="connect()">
-
-    <div id="peerZone" style="width: 100%; height: 20%; margin-top: 0px;">
-    </div>
-    <div id="recordings">
-        <a id="selfDownloadLink"></a>
-        <a id="callerDownloadLink"></a>
-    </div>
-    <div id="seperator"><br><br></div>
-
-    <div class="container" style="width:100%; height:80%; margin-bottom: 0px;">
-        <div class="row md-center" id="cameras">
-            <video autoplay="autoplay" playsinline="playsinline" id="selfVideo" class="easyrtcMirror" muted></video>
-            <video autoplay="autoplay" playsinline="playsinline" id="callerVideo" muted></video>
+    <div id="mySidenav" class="sidenav drawr-container">
+        <div>
+            <img src="http://www.ilkeratabay.com/wp-content/uploads/2019/11/90derece.png" height="32" width="32"
+                id="rotater" />
+            <img id="rotaterImage" style="left: -99999px; position: absolute;" />
         </div>
-        <button id="start-call" class="col" onclick="performCall(theirID);" disabled>ARAMAYI BAŞLAT</button>
-        <button id="end-call" class="col" onclick="disconnect();">ARAMAYI BİTİR</button>
-        <button id="startRecording" class="col" onclick="startRecording();">KAYDI BAŞLAT</button>
-        <button id="stopRecording" class="col" onclick="endRecording();">KAYDI BİTİR</button>
-        <button id="change-camera-source" class="col">KAMERAYI
-            DEĞİŞTİR</button>
-        <!-- Trigger/Open The Modal -->
-        <button id="myBtn" class="col">Fotoğraf Çek</button>
-        <!-- Fotoğraf Çekmek İçin Kullanılacak Olan Modal (Mobil Tarafta)-->
-        <div id="myModal" class="modal" style="z-index: 99;">
-            <!-- Modal content -->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <span class="close">&times;</span>
-                    <h4>Sompo Sigorta - Canlı Destek</h4>
-                </div>
-                <div class="modal-body">
-                    <video id="video" style="margin: 0 auto; width: 100%; height: auto;" autoplay muted></video>
-                    <div><button id='take-a-photo' onclick="take_photo()">Fotoğraf Çek</button></div>
-                </div>
-                <div class="modal-footer">
-                    <h3></h3>
-                </div>
+        <div id="drawr-container" style="margin:40px;border:2px dotted gray;">
+            <canvas id="touchUpCanvasForDrawing" class="demo-canvas drawr-test1"></canvas>
+        </div>
+        <div>
+            <button id="saveChanges">Kaydet</button>
+        </div>
+    </div>
+    <div id="wholeContent">
+        <div id="peerZone" style="width: 100%; height: 20%; margin-top: 0px;">
+        </div>
+        <div id="recordings">
+            <a id="selfDownloadLink"></a>
+            <a id="callerDownloadLink"></a>
+        </div>
+        <div id="seperator"><br><br></div>
+
+        <div class="container" style="width:100%; height:80%; margin-bottom: 0px;">
+            <div class="row md-center" id="cameras">
+                <video autoplay="autoplay" playsinline="playsinline" id="selfVideo" class="easyrtcMirror" muted></video>
+                <video autoplay="autoplay" playsinline="playsinline" id="callerVideo" muted></video>
             </div>
-        </div>
-        <!-- Fotoğraf Çekmek İçin Kullanılacak Modal Sonu -->
+            <div style="bottom: 0; position: absolute; margin: 0 auto;" class="row md-center">
+                <button id="start-call" class="col" onclick="performCall(theirID);" disabled>ARAMAYI BAŞLAT</button>
+                <button id="end-call" class="col" onclick="disconnect();">ARAMAYI BİTİR</button>
+                <button id="startRecording" class="col" onclick="startRecording();">KAYDI BAŞLAT</button>
+                <button id="stopRecording" class="col" onclick="endRecording();">KAYDI BİTİR</button>
+                <button id="change-camera-source" class="col">KAMERAYI
+                    DEĞİŞTİR</button>
+                <button id="myBtn" class="col">Fotoğraf Çek</button>
 
-        <!-- Fotoğrafın düzenleneceği modal (Destek Tarafında)-->
-        <div id="touchUpModal" class="modal" style="z-index: 99;">
-            <!-- Modal content -->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <span class="close">&times;</span>
-                    <h4>Sompo Sigorta - Canlı Destek</h4>
-                </div>
-                <div class="modal-body image" style="height: 75vh;">
-                    <div>
-                        <img src="http://www.ilkeratabay.com/wp-content/uploads/2019/11/eksi90derece.png" height="32"
-                            width="32" onclick="rotate('minus')" />
-                        <img src="http://www.ilkeratabay.com/wp-content/uploads/2019/11/90derece.png" height="32"
-                            width="32" onclick="rotate('plus')" />
+            </div>
+
+            <!-- Trigger/Open The Modal -->
+            <!-- Fotoğraf Çekmek İçin Kullanılacak Olan Modal (Mobil Tarafta)-->
+            <div id="myModal" class="modal" style="z-index: 99;">
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="close">&times;</span>
+                        <h4>Sompo Sigorta - Canlı Destek</h4>
                     </div>
-                    <div>
-                        <img id="imageTouchUp" />
+                    <div class="modal-body">
+                        <video id="video" style="margin: 0 auto; width: 100%; height: auto;" autoplay muted></video>
+                        <div><button id='take-a-photo' onclick="gotMedia()">Fotoğraf Çek</button></div>
+                    </div>
+                    <div class="modal-footer">
+                        <h3></h3>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <h3>Footer</h3>
+            </div>
+            <!-- Fotoğraf Çekmek İçin Kullanılacak Modal Sonu -->
+
+            <!-- Fotoğrafın düzenleneceği modal (Destek Tarafında)-->
+            <div id="touchUpModal" class="modal" style="z-index: 99;">
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="close">&times;</span>
+                        <h4>Sompo Sigorta - Canlı Destek</h4>
+                    </div>
+                    <div class="modal-body image" style="height: 75vh;">
+                        <div>
+                            <img src="http://www.ilkeratabay.com/wp-content/uploads/2019/11/eksi90derece.png"
+                                height="32" width="32" onclick="rotate('minus')" />
+                            <img src="http://www.ilkeratabay.com/wp-content/uploads/2019/11/90derece.png" height="32"
+                                width="32" onclick="rotate('plus')" />
+                        </div>
+                        <div>
+
+                            <img id="imageTouchUp" />
+                            <img id="resultImg" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <h3>Footer</h3>
+                    </div>
                 </div>
             </div>
+            <!-- Fotoğraf Düzenleme Modal Sonu -->
         </div>
-        <!-- Fotoğraf Düzenleme Modal Sonu -->
-    </div>
 
-    <div id="otherClients"></div>
+        <div id="otherClients"></div>
     </div>
-    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
+    </div>
+    <script type="text/javascript" src="js/drawr.js"></script>
     <script src="js/app.js"></script>
 
 
@@ -163,6 +186,7 @@
                 modal.style.display = "none";
             } else if (event.target == touchUpModal) {
                 touchUpModal.style.display = "none";
+                document.getElementById('touchUpCanvasForDrawing').undoStack = [];
             }
         }
 

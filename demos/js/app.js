@@ -33,6 +33,7 @@ var fileInput,
 	fileNames = new Array('');
 var supportsRecording = easyrtc.supportsRecording();
 var touchUpModal = document.getElementById('touchUpModal');
+var drawer;
 
 function buildPeerBlockName(easyrtcid) {
 	return 'peerzone_' + easyrtcid;
@@ -63,14 +64,27 @@ function blobToFile(theBlob, fileName) {
 
 function rotate(parameter) {
 	if (parameter == 'minus') {
-		$('#imageTouchUp').removeClass('rotateimg90');
+		$('#touchUpCanvasForDrawing').removeClass('rotateimg90');
 	} else {
-		if ($('#imageTouchUp').attr('class').indexOf('rotateimg90') < 0) {
-			$('#imageTouchUp').addClass('rotateimg90');
-			$('.modal-body.image').height($('#imageTouchUp').width() + 40 + 'px');
+		if ($('#touchUpCanvasForDrawing').attr('class').indexOf('rotateimg90') < 0) {
+			$('#touchUpCanvasForDrawing').addClass('rotateimg90');
 		}
 	}
 }
+
+/*SIDEBAR İÇİN FONKSİYONLAR */
+function openNav() {
+	document.getElementById('mySidenav').style.width = '250px';
+	document.getElementById('wholeContent').style.marginLeft = '250px';
+	$(drawer).drawr("destroy");
+}
+
+function closeNav() {
+	document.getElementById('mySidenav').style.width = '0';
+	document.getElementById('wholeContent').style.marginLeft = '0';
+	$(drawer).drawr("destroy");
+}
+/*SIDEBAR İÇİN FONKSİYONLAR */
 
 function connect() {
 	if (navigator.userAgent.indexOf('Windows') == -1) {
@@ -271,7 +285,6 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 	}
 }
 
-
 function acceptRejectCB(otherGuy, fileNameList, wasAccepted) {
 	console.log(otherGuy);
 	var receiveBlock = document.getElementById(buildReceiveAreaName(otherGuy));
@@ -311,7 +324,6 @@ function acceptRejectCB(otherGuy, fileNameList, wasAccepted) {
 		receiveBlock.appendChild(button);*/
 }
 
-
 function receiveStatusCB(otherGuy, msg) {
 	var receiveBlock = document.getElementById(buildReceiveAreaName(otherGuy));
 	if (!receiveBlock) return;
@@ -340,14 +352,169 @@ function receiveStatusCB(otherGuy, msg) {
 	return true;
 }
 
-function touchUpOnPhoto(photoBlob) {
-	touchUpModal.style.display = 'block';
-	var img = document.getElementById('imageTouchUp');
-	img.setAttribute('src', URL.createObjectURL(photoBlob));
-	const photoWidth = $('#imageTouchUp').width();
-	img.width = $('.modal-body.image').height();
-	img.setAttribute('class', 'rotateimg90');
+/*BU KISIMDA DRAWR'DA OLMAYAN ROTATE METODUNU YAZDIM */
 
+function loadImage(url) {
+	return new Promise((resolve, reject) => {
+		const img = new Image();
+		img.addEventListener('load', () => resolve(img));
+		img.addEventListener('error', reject); // don't forget this one
+		img.src = url;
+	});
+}
+
+function imageRotater(imgData, width, height, degree) {
+	if ($("#rotaterImage").hasClass("rotate")) {
+		$("#rotaterImage").removeClass("rotate");
+	}
+	var rotaterCanvas = document.createElement("canvas");
+	rotaterCanvas.width = height;
+	rotaterCanvas.height = width;
+	var rotaterContext = rotaterCanvas.getContext("2d");
+	var rotaterImage = new Image();
+
+	rotaterImage.onload = async function loadAndUse() {
+		$("#rotaterImage").addClass("rotate");
+
+		const image = await loadImage(imgData);
+
+		rotaterContext.translate(rotaterCanvas.width / 2, rotaterCanvas.height / 2);
+
+		rotaterContext.rotate(degree * Math.PI / 180);
+
+		rotaterContext.drawImage(image, -image.width / 2, -image.height / 2);
+
+		rotaterContext.rotate(-degree * Math.PI / 180);
+
+		rotaterContext.translate(-rotaterCanvas.width / 2, -rotaterCanvas.height / 2);
+
+		var data = rotaterCanvas.toDataURL("image/png");
+		$("#rotaterImage").removeClass("rotate");
+		return data;
+
+	}
+	return rotaterImage.onload().then(function (result) {
+		return result;
+	});
+}
+
+$('#rotater').on('click', function () {
+	var newDrawer = document.createElement("canvas");
+	newDrawer.width = drawer.height;
+	newDrawer.height = drawer.width;
+	var ctx = newDrawer.getContext("2d");
+
+	var recentUndoStack = drawer.undoStack;
+	$(drawer).drawr("destroy");
+	$(newDrawer).attr("id", "touchUpCanvasForDrawing");
+	$(newDrawer).addClass("demo-canvas");
+	$(newDrawer).addClass("drawr-test1");
+	$(drawer).replaceWith(newDrawer);
+	drawer = newDrawer;
+
+	var photoToEditNewCanvas = new Image();
+
+	photoToEditNewCanvas.onload = function () {
+
+		var imageDraw = new Image();
+		imageDraw.onload = function () {
+			$("#drawr-container").css({
+				width: this.width,
+				height: this.height
+			});
+
+			$(newDrawer).drawr({
+				enable_tranparency: false,
+				canvas_width: this.width,
+				canvas_height: this.height,
+				undo_max_levels: 100
+			});
+
+			ctx.drawImage(this, 0, 0, this.width, this.height);
+
+			$(newDrawer).drawr('start');
+
+			newDrawer.undoStack = [{
+				data: newDrawer.toDataURL('image/png'),
+				current: true
+			}];
+
+			for (var i = 1; i < recentUndoStack.length; i++) {
+				var anImage = new Image();
+
+				anImage.onload = function () {
+					ctx.drawImage(this, 0, 0, this.width, this.height);
+					newDrawer.undoStack.push({
+						data: this.src,
+						current: true
+					});
+					return;
+				};
+				imageRotater(recentUndoStack[i].data, this.height, this.width, 90).then(function (res) {
+					anImage.src = res;
+				});
+			}
+		};
+		imageRotater(recentUndoStack[0].data, this.width, this.height, 90).then(function (res) {
+			imageDraw.src = res;
+		});
+
+	};
+
+	photoToEditNewCanvas.src = recentUndoStack[0].data;
+});
+
+
+/*BU KISIMDA DRAWR'DA OLMAYAN ROTATE METODUNU YAZDIM --!>*/
+function touchUpOnPhoto(photoBlob, name) {
+	openNav();
+
+	var photoToEdit = new Image();
+	drawer = document.getElementById('touchUpCanvasForDrawing');
+	var ctx = drawer.getContext('2d');
+	photoToEdit.onload = async function () {
+		photoToEdit = await loadImage(URL.createObjectURL(photoBlob));
+		console.log(photoToEdit.src);
+		const scale = $('.modal-body.image').height() * 100 / this.width;
+		this.width = $('.modal-body.image').height();
+		this.height = this.height * (scale / 100);
+		$(drawer).drawr({
+			enable_tranparency: false,
+			canvas_width: this.width,
+			canvas_height: this.height,
+			undo_max_levels: 100
+		});
+
+		ctx.drawImage(this, 0, 0, this.width, this.height);
+
+		$(drawer).drawr('start');
+
+		drawer.undoStack = [{
+			data: drawer.toDataURL('image/png'),
+			current: true
+		}];
+
+		document.getElementById('mySidenav').style.width = this.width + 40 + 'px';
+		document.getElementById('wholeContent').style.marginLeft = this.width + 40 + 'px';
+		$('#drawr-container').css({
+			width: this.width,
+			height: this.height
+		});
+	};
+
+	$('#saveChanges').on('click', function () {
+		// fotoğraf üzerinde değişimler bittikten sonra fotoğrafı kaydedeceğiz.
+		console.log(name);
+		drawer.toBlob(function (blob) {
+			easyrtc_ft.saveAs(blob, name.split('.')[1] + '_CHANGED' + name.split('.')[2]);
+		});
+
+		drawer.undoStack = [];
+
+		closeNav();
+	});
+
+	photoToEdit.src = URL.createObjectURL(photoBlob);
 }
 
 function blobAcceptor(otherGuy, blob, filename) {
@@ -362,9 +529,8 @@ function blobAcceptor(otherGuy, blob, filename) {
 	image.setAttribute('width', '10%');
 	image.setAttribute('height', 'auto');
 	image.addEventListener('click', function () {
-		touchUpOnPhoto(blob);
+		touchUpOnPhoto(blob, filename);
 	});
-
 	document.getElementById('peerZone').appendChild(image);
 }
 
@@ -384,6 +550,17 @@ function loginSuccess(easyrtcid) {
 
 		$('#selfVideo').css({
 			left: '-9999999px'
+		});
+	} else {
+		$('#selfVideo').width("80%");
+		$('#selfVideo').height("auto");
+		$('#selfVideo').css({
+			margin: "0 auto",
+			display: "block"
+		});
+		$('#callerVideo').css({
+			left: "-99999px",
+			position: "absolute"
 		});
 	}
 }
@@ -419,38 +596,42 @@ function connectFailure(err) {
 }
 
 function take_photo() {
-	/*const constraints = {
+	const constraints = {
 		video: {
-			deviceId: cameraID ? {
-				exact: cameraID
+			deviceId: backCameraID ? {
+				exact: backCameraID
 			} : undefined
-		}
+		},
+		audio: false
 	};
-	navigator.mediaDevices
+	/*navigator.mediaDevices
 		.getUserMedia(constraints)
 		.then(gotMedia)
 		.catch((error) => console.error('getUserMedia() error:', error));*/
-	gotMedia(backMediaStreamTrack);
+	//gotMedia();
 }
 
-function gotMedia(mediaStream) {
-	if (mediaStream == null || mediaStream == undefined) {
-		return;
-	}
-	const mediaStreamTrack = mediaStream.getVideoTracks()[0];
-	const imageCapture = new ImageCapture(mediaStreamTrack);
+function gotMedia() {
+	console.log('START-----------------------------------------');
+	//const mediaStreamTrack = mediaStream.getVideoTracks()[0];
+	//const imageCapture = new ImageCapture(mediaStreamTrack);
+	const imageCapture = new ImageCapture(backMediaStreamTrack);
 	const img = document.createElement('img');
 
 	imageCapture
 		.takePhoto()
 		.then((blob) => {
 			//alert("mahmutcan");
+			console.log('burada 1');
 			sleep(1000);
+			console.log('burada 2');
 			img.setAttribute('src', URL.createObjectURL(blob));
 			img.setAttribute('width', '30%');
 			$(img).addClass('rotateimg90');
 			console.log(blob);
+			console.log('burada 3');
 			bloby = blob;
+			console.log('burada 4');
 			document.getElementById('seperator').appendChild(img);
 			return;
 			//send_taken_photo(blob);
@@ -460,11 +641,10 @@ function gotMedia(mediaStream) {
 		})
 		.catch((error) => {
 			alert(error);
-			modal_PhotoTaker();
-			connect();
-			performCall(theirID);
+			console.log(error);
+			easyrtc.renegotiate(theirID);
 		});
-	console.log(imageCapture);
+	console.log('END-----------------------------------------');
 }
 
 /* KAYIT (RECORDING) İŞLEMİ İÇİN BLOK BAŞLANGIÇ*/
