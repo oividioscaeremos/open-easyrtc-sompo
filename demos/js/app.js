@@ -74,8 +74,8 @@ function rotate(parameter) {
 
 /*SIDEBAR İÇİN FONKSİYONLAR */
 function openNav() {
-	document.getElementById('mySidenav').style.width = '250px';
-	document.getElementById('wholeContent').style.marginLeft = '250px';
+	document.getElementById('mySidenav').style.width = '330px';
+	document.getElementById('wholeContent').style.marginLeft = '330px';
 	$(drawer).drawr("destroy");
 }
 
@@ -474,7 +474,7 @@ function touchUpOnPhoto(photoBlob, name) {
 	var ctx = drawer.getContext('2d');
 	photoToEdit.onload = async function () {
 		photoToEdit = await loadImage(URL.createObjectURL(photoBlob));
-		console.log(photoToEdit.src);
+
 		const scale = $('.modal-body.image').height() * 100 / this.width;
 		this.width = $('.modal-body.image').height();
 		this.height = this.height * (scale / 100);
@@ -494,8 +494,8 @@ function touchUpOnPhoto(photoBlob, name) {
 			current: true
 		}];
 
-		document.getElementById('mySidenav').style.width = this.width + 40 + 'px';
-		document.getElementById('wholeContent').style.marginLeft = this.width + 40 + 'px';
+		document.getElementById('mySidenav').style.width = this.width + 80 + 'px';
+		document.getElementById('wholeContent').style.marginLeft = this.width + 80 + 'px';
 		$('#drawr-container').css({
 			width: this.width,
 			height: this.height
