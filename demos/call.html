@@ -210,6 +210,7 @@
             // Get access to the camera!
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 easyrtc.getVideoSourceList(function (list) {
+                    alert("merhaba");
                     var i;
                     for (i = 0; i < list.length; i++) {
                         let str = '';
