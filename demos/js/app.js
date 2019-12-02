@@ -124,8 +124,6 @@ function removeIfPresent(parent, childname) {
 }
 
 function performCall(othereasyrtcid) {
-	easyrtc.hangupAll();
-
 	theirID = othereasyrtcid;
 
 	var acceptedCB = function (accepted, caller) {

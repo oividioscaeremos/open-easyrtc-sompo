@@ -204,10 +204,12 @@
             // Grab elements, create settings, etc.
             var video = document.getElementById('video');
 
+            alert("navigator.mediaDevices " + navigator.mediaDevices);
+            alert("nnavigator.mediaDevices.getUserMedia " + navigator.mediaDevices.getUserMedia);
+
             // Get access to the camera!
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 easyrtc.getVideoSourceList(function (list) {
-                    alert(list[i].label);
                     var i;
                     for (i = 0; i < list.length; i++) {
                         let str = '';
