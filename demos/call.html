@@ -211,6 +211,8 @@
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 easyrtc.getVideoSourceList(function (list) {
                     alert("merhaba");
+                    alert(list.length);
+                    alert(list);
                     var i;
                     for (i = 0; i < list.length; i++) {
                         let str = '';
