@@ -204,57 +204,51 @@
             // Grab elements, create settings, etc.
             var video = document.getElementById('video');
 
-            alert("navigator.mediaDevices " + navigator.mediaDevices);
-            alert("nnavigator.mediaDevices.getUserMedia " + navigator.mediaDevices.getUserMedia);
-
             // Get access to the camera!
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                easyrtc.getVideoSourceList(function (list) {
-                    alert("merhaba");
-                    var i;
-                    for (i = 0; i < list.length; i++) {
-                        alert(list[i].label);
-                        let str = '';
-                        if (list[i].label.indexOf('back') > 0) {
-                            cameraID = list[i].deviceId;
-                            backCameraID = list[i].deviceId;
-                            const constraints = {
-                                video: {
-                                    deviceId: cameraID ? {
-                                        exact: cameraID
-                                    } : undefined
-                                },
-                                audio: undefined
-                            };
-                            navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-                                video.srcObject = stream;
-                                backMediaStreamTrack = stream.getVideoTracks()[0];
-                                video.play();
-                            });
-                            break;
-                        } else {
-                            cameraID = list[i].deviceId;
-                            frontCameraID = list[i].deviceId;
-                            const constraints = {
-                                video: {
-                                    width: 720,
-                                    height: 1080,
-                                    deviceId: cameraID ? {
-                                        exact: cameraID
-                                    } : undefined
-                                },
-                                audio: undefined
-                            };
-                            navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-                                video.srcObject = stream;
-                                frontMediaStreamTrack = stream.getVideoTracks()[0];
-                                video.play();
-                            });
-                        }
+            easyrtc.getVideoSourceList(function (list) {
+                var i;
+                for (i = 0; i < list.length; i++) {
+                    alert(list[i].label);
+                    let str = '';
+                    if (list[i].label.indexOf('back') > 0 || list[i].label.indexOf('Arka') > 0) {
+                        cameraID = list[i].deviceId;
+                        backCameraID = list[i].deviceId;
+                        const constraints = {
+                            video: {
+                                deviceId: cameraID ? {
+                                    exact: cameraID
+                                } : undefined
+                            },
+                            audio: undefined
+                        };
+                        navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+                            video.srcObject = stream;
+                            backMediaStreamTrack = stream.getVideoTracks()[0];
+                            video.play();
+                        });
+                        break;
+                    } else {
+                        cameraID = list[i].deviceId;
+                        frontCameraID = list[i].deviceId;
+                        const constraints = {
+                            video: {
+                                width: 720,
+                                height: 1080,
+                                deviceId: cameraID ? {
+                                    exact: cameraID
+                                } : undefined
+                            },
+                            audio: undefined
+                        };
+                        navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+                            video.srcObject = stream;
+                            frontMediaStreamTrack = stream.getVideoTracks()[0];
+                            video.play();
+                        });
                     }
-                });
+                }
+            });
 
-            }
         }
     </script>
 

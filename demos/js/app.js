@@ -339,7 +339,7 @@ function receiveStatusCB(otherGuy, msg) {
 	return true;
 }
 
-/*BU KISIMDA DRAWR'DA OLMAYAN ROTATE METODUNU YAZDIM */
+/*<!--- BU KISIMDA DRAWR'DA OLMAYAN ROTATE METODUNU YAZDIM */
 
 function loadImage(url) {
 	return new Promise((resolve, reject) => {
@@ -451,8 +451,8 @@ $('#rotater').on('click', function () {
 	photoToEditNewCanvas.src = recentUndoStack[0].data;
 });
 
+/*BU KISIMDA DRAWR'DA OLMAYAN ROTATE METODUNU YAZDIM ---!>*/
 
-/*BU KISIMDA DRAWR'DA OLMAYAN ROTATE METODUNU YAZDIM --!>*/
 function touchUpOnPhoto(photoBlob, name) {
 	openNav();
 
@@ -526,11 +526,9 @@ function loginSuccess(easyrtcid) {
 	easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
 
 	// bu kısımda masaüstü kullanıcımızın görüntüsünün karşıya gitmesi engelleniyor.
-	alert(navigator.userAgent.indexOf('iPhone'));
 	if (navigator.userAgent.indexOf('Windows') != -1 || (navigator.userAgent.indexOf('Mac') != -1 && navigator.userAgent.indexOf('iPhone') == -1)) {
-		/*const mediaSource = new MediaStream();
+		const mediaSource = new MediaStream();
 		alert("selam fıstık");
-		let stream = $('#selfVideo')[0].srcObject;
 		let tracks = $('#selfVideo')[0].srcObject.getVideoTracks();
 		tracks.forEach((t) => {
 			t.enabled = false;
@@ -538,7 +536,7 @@ function loginSuccess(easyrtcid) {
 
 		$('#selfVideo').css({
 			left: '-9999999px'
-		});*/
+		});
 	} else {
 		$('#selfVideo').width("80%");
 		$('#selfVideo').height("auto");
@@ -610,16 +608,12 @@ function gotMedia() {
 		.takePhoto()
 		.then((blob) => {
 			//alert("mahmutcan");
-			console.log('burada 1');
 			sleep(1000);
-			console.log('burada 2');
 			img.setAttribute('src', URL.createObjectURL(blob));
 			img.setAttribute('width', '30%');
 			$(img).addClass('rotateimg90');
 			console.log(blob);
-			console.log('burada 3');
 			bloby = blob;
-			console.log('burada 4');
 			document.getElementById('seperator').appendChild(img);
 			return;
 			//send_taken_photo(blob);
