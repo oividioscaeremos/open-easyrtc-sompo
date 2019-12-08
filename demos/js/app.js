@@ -62,37 +62,85 @@ function blobToFile(theBlob, fileName) {
 	return theBlob;
 }
 
-function rotate(parameter) {
-	if (parameter == 'minus') {
-		$('#touchUpCanvasForDrawing').removeClass('rotateimg90');
-	} else {
-		if ($('#touchUpCanvasForDrawing').attr('class').indexOf('rotateimg90') < 0) {
-			$('#touchUpCanvasForDrawing').addClass('rotateimg90');
-		}
-	}
-}
-
 /*SIDEBAR İÇİN FONKSİYONLAR */
 function openNav() {
 	document.getElementById('mySidenav').style.width = '330px';
 	document.getElementById('wholeContent').style.marginLeft = '330px';
-	$(drawer).drawr("destroy");
+	$(drawer).drawr('destroy');
 }
 
 function closeNav() {
 	document.getElementById('mySidenav').style.width = '0';
 	document.getElementById('wholeContent').style.marginLeft = '0';
-	$(drawer).drawr("destroy");
+	$(drawer).drawr('destroy');
 }
 /*SIDEBAR İÇİN FONKSİYONLAR */
 
+function detectmob() {
+	if (navigator.userAgent.match(/Android/i) ||
+		navigator.userAgent.match(/webOS/i) ||
+		navigator.userAgent.match(/iPhone/i) ||
+		navigator.userAgent.match(/iPad/i) ||
+		navigator.userAgent.match(/iPod/i) ||
+		navigator.userAgent.match(/BlackBerry/i) ||
+		navigator.userAgent.match(/Windows Phone/i)
+	) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function checkDeviceAndOrganizeButtons(){
+	if(detectmob()){
+		console.log("mobilsin");
+		$("#desktop-buttons").empty();
+		$("#mobile-buttons").css({
+			"bottom": "0px",
+			"position": "absolute"
+		});
+	}else{
+		console.log("desktopsın");
+		$("#mobile-buttons").empty();
+	}
+}
+
+
 function connect() {
+
+	checkDeviceAndOrganizeButtons();
+
+	var previousOrientation = window.orientation;
+
+	var checkOrientation = function () {
+		if (window.orientation !== previousOrientation) {
+			previousOrientation = window.orientation;
+			if(window.orientation == -90){
+				$("#mobile-buttons").css({
+					"width" : "20%",
+					"right":"0px",
+				});
+			}else if(window.orientation == 90){
+				
+			}else{
+				$("#mobile-buttons").css({
+					"width": "100%",
+					"bottom": "0px",
+					"position":"absolute"
+				});
+			}
+		}
+	};
+
+	window.addEventListener("resize", checkOrientation, false);
+	window.addEventListener("orientationchange", checkOrientation, false);
+	setInterval(checkOrientation, 2000);
 
 	easyrtc.enableDataChannels(true);
 
 	easyrtc.setRoomOccupantListener(convertListToButtons);
 
-	easyrtc.setDataChannelOpenListener(function (easyrtcid, usesPeer) {
+	easyrtc.setDataChannelOpenListener(function(easyrtcid, usesPeer) {
 		var obj = document.getElementById(buildDragNDropName(easyrtcid));
 		if (!obj) {
 			console.log('no such object ');
@@ -101,13 +149,15 @@ function connect() {
 		jQuery(obj).removeClass('notConnected');
 	});
 
-	easyrtc.setDataChannelCloseListener(function (easyrtcid) {
+	easyrtc.setDataChannelCloseListener(function(easyrtcid) {
 		jQuery(buildDragNDropName(easyrtcid)).addClass('notConnected');
 		jQuery(buildDragNDropName(easyrtcid)).removeClass('connected');
 	});
 
 	//easyrtc.connect('easyrtc.dataFileTransfer', loginSuccess, loginFailure);
-	easyrtc.easyApp('easyrtc.dataFileTransfer', 'selfVideo', ['callerVideo'], loginSuccess, loginFailure);
+	//easyrtc.easyApp('easyrtc.dataFileTransfer', 'selfVideo', [ 'callerVideo' ], loginSuccess, loginFailure);
+	sleep(1000);
+	easyrtc.easyApp('easyrtc.videoChatHd', 'selfVideo', ['callerVideo'], loginSuccess, loginFailure);
 }
 
 function disconnect() {
@@ -126,13 +176,13 @@ function removeIfPresent(parent, childname) {
 function performCall(othereasyrtcid) {
 	theirID = othereasyrtcid;
 
-	var acceptedCB = function (accepted, caller) {
+	var acceptedCB = function(accepted, caller) {
 		if (!accepted) {
 			easyrtc.showError('CALL-REJECTED', 'Sorry, your call to ' + easyrtc.idToName(caller) + ' was rejected');
 		}
 	};
-	var successCB = function () {};
-	var failureCB = function (err) {
+	var successCB = function() {};
+	var failureCB = function(err) {
 		alert('failure ' + err);
 	};
 
@@ -152,14 +202,6 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 	function buildDropDiv(easyrtcid) {
 		var statusDiv = document.createElement('div');
 		statusDiv.className = 'dragndropStatus';
-		//
-		//fileInput = document.createElement('input');
-		//fileInput.className = 'fileInput';
-		//fileInput.type = 'file';
-		//
-		//dropArea.id = buildDragNDropName(easyrtcid);
-		//dropArea.className = 'dragndrop notConnected';
-		//dropArea.appendChild(fileInput);
 
 		function updateStatusDiv(state) {
 			switch (state.status) {
@@ -175,13 +217,13 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 					break;
 				case 'rejected':
 					statusDiv.innerHTML = 'cancelled';
-					setTimeout(function () {
+					setTimeout(function() {
 						statusDiv.innerHTML = '';
 					}, 2000);
 					break;
 				case 'done':
 					statusDiv.innerHTML = 'done';
-					setTimeout(function () {
+					setTimeout(function() {
 						statusDiv.innerHTML = '';
 					}, 3000);
 					break;
@@ -206,37 +248,26 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 				if (!fileSender) {
 					fileSender = easyrtc_ft.buildFileSender(easyrtcid, updateStatusDiv);
 				}
-				fileSender(files, true /* assume binary */ );
+				fileSender(files, true /* assume binary */);
 			} else {
 				easyrtc.showError('user-error', 'Wait for the connection to complete before adding more files!');
 			}
 		}
-		//easyrtc_ft.buildDragNDropRegion(dropArea, filesHandler);
-		//
-		//fileInput.addEventListener('change', function () {
-		//	console.log("fileInput.files");
-		//	console.log(fileInput.files);
-		//	filesHandler(fileInput.files);
-		//});
 
-		$('#seperator').bind('DOMSubtreeModified', function (event) {
+		$('#seperator').bind('DOMSubtreeModified', function(event) {
 			let filesList = new Array(File);
 			filesList.areBinary = true;
 			filesList[0] = blobToFile(bloby);
 			filesHandler(filesList);
 		});
 
-		//console.log("dropArea");
-		//console.log(dropArea);
-
 		var container = document.createElement('div');
 		console.log('container');
 		console.log(container);
-		//container.appendChild(dropArea);
 		container.appendChild(statusDiv);
 		return container;
 	}
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	function buildReceiveDiv(i) {
 		var div = document.createElement('div');
 		div.id = buildReceiveAreaName(i);
@@ -250,10 +281,10 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 			var button = document.getElementById('start-call');
 			theirID = easyrtcid;
 			button.disabled = false;
-			button.onclick = (function (easyrtcid) {
-				return function () {
+			button.onclick = (function(easyrtcid) {
+				return function() {
 					performCall(easyrtcid);
-					easyrtc.setOnHangup(function (easyrtcid, slot) {
+					easyrtc.setOnHangup(function(easyrtcid, slot) {
 						document.getElementById('start-call').disabled = true;
 					});
 				};
@@ -262,8 +293,6 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 			var peerBlock = document.createElement('div');
 			peerBlock.id = buildPeerBlockName(easyrtcid);
 			peerBlock.className = 'peerblock';
-			//peerBlock.appendChild(document.createTextNode(' For peer ' + easyrtcid));
-			//peerBlock.appendChild(document.createElement('br'));
 			peerBlock.appendChild(buildReceiveDiv(easyrtcid));
 			peerBlock.appendChild(buildDropDiv(easyrtcid));
 			peerZone.appendChild(peerBlock);
@@ -279,36 +308,6 @@ function acceptRejectCB(otherGuy, fileNameList, wasAccepted) {
 	receiveBlock.style.display = 'inline-block';
 
 	wasAccepted(true);
-	/*
-		//
-		// list the files being offered
-		//
-		receiveBlock.appendChild(document.createTextNode('Files offered'));
-		receiveBlock.appendChild(document.createElement('br'));
-		for (var i = 0; i < fileNameList.length; i++) {
-			receiveBlock.appendChild(
-				document.createTextNode('  ' + fileNameList[i].name + '(' + fileNameList[i].size + ' bytes)')
-			);
-			receiveBlock.appendChild(document.createElement('br'));
-		}
-		//
-		// provide accept/reject buttons
-		//
-		var button = document.createElement('button');
-		button.appendChild(document.createTextNode('Accept'));
-		button.onclick = function () {
-			jQuery(receiveBlock).empty();
-			wasAccepted(true);
-		};
-		receiveBlock.appendChild(button);
-
-		button = document.createElement('button');
-		button.appendChild(document.createTextNode('Reject'));
-		button.onclick = function () {
-			wasAccepted(false);
-			receiveBlock.style.display = 'none';
-		};
-		receiveBlock.appendChild(button);*/
 }
 
 function receiveStatusCB(otherGuy, msg) {
@@ -323,7 +322,7 @@ function receiveStatusCB(otherGuy, msg) {
 			break;
 		case 'done':
 			receiveBlock.innerHTML = 'Stopped because ' + msg.reason;
-			setTimeout(function () {
+			setTimeout(function() {
 				receiveBlock.style.display = 'none';
 			}, 1000);
 			break;
@@ -351,17 +350,17 @@ function loadImage(url) {
 }
 
 function imageRotater(imgData, width, height, degree) {
-	if ($("#rotaterImage").hasClass("rotate")) {
-		$("#rotaterImage").removeClass("rotate");
+	if ($('#rotaterImage').hasClass('rotate')) {
+		$('#rotaterImage').removeClass('rotate');
 	}
-	var rotaterCanvas = document.createElement("canvas");
+	var rotaterCanvas = document.createElement('canvas');
 	rotaterCanvas.width = height;
 	rotaterCanvas.height = width;
-	var rotaterContext = rotaterCanvas.getContext("2d");
+	var rotaterContext = rotaterCanvas.getContext('2d');
 	var rotaterImage = new Image();
 
 	rotaterImage.onload = async function loadAndUse() {
-		$("#rotaterImage").addClass("rotate");
+		$('#rotaterImage').addClass('rotate');
 
 		const image = await loadImage(imgData);
 
@@ -375,37 +374,35 @@ function imageRotater(imgData, width, height, degree) {
 
 		rotaterContext.translate(-rotaterCanvas.width / 2, -rotaterCanvas.height / 2);
 
-		var data = rotaterCanvas.toDataURL("image/png");
-		$("#rotaterImage").removeClass("rotate");
+		var data = rotaterCanvas.toDataURL('image/png');
+		$('#rotaterImage').removeClass('rotate');
 		return data;
-
-	}
-	return rotaterImage.onload().then(function (result) {
+	};
+	return rotaterImage.onload().then(function(result) {
 		return result;
 	});
 }
 
-$('#rotater').on('click', function () {
-	var newDrawer = document.createElement("canvas");
+$('#rotater').on('click', function() {
+	var newDrawer = document.createElement('canvas');
 	newDrawer.width = drawer.height;
 	newDrawer.height = drawer.width;
-	var ctx = newDrawer.getContext("2d");
+	var ctx = newDrawer.getContext('2d');
 
 	var recentUndoStack = drawer.undoStack;
-	$(drawer).drawr("destroy");
-	$(newDrawer).attr("id", "touchUpCanvasForDrawing");
-	$(newDrawer).addClass("demo-canvas");
-	$(newDrawer).addClass("drawr-test1");
+	$(drawer).drawr('destroy');
+	$(newDrawer).attr('id', 'touchUpCanvasForDrawing');
+	$(newDrawer).addClass('demo-canvas');
+	$(newDrawer).addClass('drawr-test1');
 	$(drawer).replaceWith(newDrawer);
 	drawer = newDrawer;
 
 	var photoToEditNewCanvas = new Image();
 
-	photoToEditNewCanvas.onload = function () {
-
+	photoToEditNewCanvas.onload = function() {
 		var imageDraw = new Image();
-		imageDraw.onload = function () {
-			$("#drawr-container").css({
+		imageDraw.onload = function() {
+			$('#drawr-container').css({
 				width: this.width,
 				height: this.height
 			});
@@ -421,31 +418,31 @@ $('#rotater').on('click', function () {
 
 			$(newDrawer).drawr('start');
 
-			newDrawer.undoStack = [{
-				data: newDrawer.toDataURL('image/png'),
-				current: true
-			}];
+			newDrawer.undoStack = [
+				{
+					data: newDrawer.toDataURL('image/png'),
+					current: true
+				}
+			];
 
 			for (var i = 1; i < recentUndoStack.length; i++) {
 				var anImage = new Image();
-
-				anImage.onload = function () {
+				console.log("Im here");
+				anImage.onload = function() {
 					ctx.drawImage(this, 0, 0, this.width, this.height);
+				};
+				imageRotater(recentUndoStack[i].data, this.height, this.width, 90).then(function(res) {
+					anImage.src = res;
 					newDrawer.undoStack.push({
-						data: this.src,
+						data: res,
 						current: true
 					});
-					return;
-				};
-				imageRotater(recentUndoStack[i].data, this.height, this.width, 90).then(function (res) {
-					anImage.src = res;
 				});
 			}
 		};
-		imageRotater(recentUndoStack[0].data, this.width, this.height, 90).then(function (res) {
+		imageRotater(recentUndoStack[0].data, this.width, this.height, 90).then(function(res) {
 			imageDraw.src = res;
 		});
-
 	};
 
 	photoToEditNewCanvas.src = recentUndoStack[0].data;
@@ -459,7 +456,7 @@ function touchUpOnPhoto(photoBlob, name) {
 	var photoToEdit = new Image();
 	drawer = document.getElementById('touchUpCanvasForDrawing');
 	var ctx = drawer.getContext('2d');
-	photoToEdit.onload = async function () {
+	photoToEdit.onload = async function() {
 		photoToEdit = await loadImage(URL.createObjectURL(photoBlob));
 
 		const scale = $('.modal-body.image').height() * 100 / this.width;
@@ -476,10 +473,12 @@ function touchUpOnPhoto(photoBlob, name) {
 
 		$(drawer).drawr('start');
 
-		drawer.undoStack = [{
-			data: drawer.toDataURL('image/png'),
-			current: true
-		}];
+		drawer.undoStack = [
+			{
+				data: drawer.toDataURL('image/png'),
+				current: true
+			}
+		];
 
 		document.getElementById('mySidenav').style.width = this.width + 80 + 'px';
 		document.getElementById('wholeContent').style.marginLeft = this.width + 80 + 'px';
@@ -489,10 +488,10 @@ function touchUpOnPhoto(photoBlob, name) {
 		});
 	};
 
-	$('#saveChanges').on('click', function () {
+	$('#saveChanges').on('click', function() {
 		// fotoğraf üzerinde değişimler bittikten sonra fotoğrafı kaydedeceğiz.
 		console.log(name);
-		drawer.toBlob(function (blob) {
+		drawer.toBlob(function(blob) {
 			easyrtc_ft.saveAs(blob, name.split('.')[1] + '_CHANGED' + name.split('.')[2]);
 		});
 
@@ -515,7 +514,7 @@ function blobAcceptor(otherGuy, blob, filename) {
 	$(image).addClass('rotateimg90');
 	image.setAttribute('width', '10%');
 	image.setAttribute('height', 'auto');
-	image.addEventListener('click', function () {
+	image.addEventListener('click', function() {
 		touchUpOnPhoto(blob, filename);
 	});
 	document.getElementById('peerZone').appendChild(image);
@@ -526,9 +525,11 @@ function loginSuccess(easyrtcid) {
 	easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
 
 	// bu kısımda masaüstü kullanıcımızın görüntüsünün karşıya gitmesi engelleniyor.
-	if (navigator.userAgent.indexOf('Windows') != -1 || (navigator.userAgent.indexOf('Mac') != -1 && navigator.userAgent.indexOf('iPhone') == -1)) {
-		const mediaSource = new MediaStream();
-		alert("selam fıstık");
+	if (
+		navigator.userAgent.indexOf('Windows') != -1 ||
+		(navigator.userAgent.indexOf('Mac') != -1 && navigator.userAgent.indexOf('iPhone') == -1)
+	) {
+		alert("mahmut");
 		let tracks = $('#selfVideo')[0].srcObject.getVideoTracks();
 		tracks.forEach((t) => {
 			t.enabled = false;
@@ -538,15 +539,15 @@ function loginSuccess(easyrtcid) {
 			left: '-9999999px'
 		});
 	} else {
-		$('#selfVideo').width("80%");
-		$('#selfVideo').height("auto");
+		$('#selfVideo').width('80%');
+		$('#selfVideo').height('auto');
 		$('#selfVideo').css({
-			margin: "0 auto",
-			display: "block"
+			margin: '0 auto',
+			display: 'block'
 		});
 		$('#callerVideo').css({
-			left: "-99999px",
-			position: "absolute"
+			left: '-99999px',
+			position: 'absolute'
 		});
 	}
 }
@@ -561,14 +562,14 @@ function changeCamera(curr) {
 	let stream = $('#selfVideo')[0].srcObject;
 	let tracks = stream.getVideoTracks();
 	if (currentCameraState == 'front') {
-		tracks.forEach((t) => {
+		tracks.map((t) => {
 			stream.removeTrack(t);
 			stream.addTrack(backMediaStreamTrack);
 		});
 		easyrtc.renegotiate(theirID);
 		currentCameraState = 'back';
 	} else {
-		tracks.forEach((t) => {
+		tracks.map((t) => {
 			stream.removeTrack(t);
 			stream.addTrack(frontMediaStreamTrack);
 		});
@@ -584,30 +585,23 @@ function connectFailure(err) {
 function take_photo() {
 	const constraints = {
 		video: {
-			deviceId: backCameraID ? {
-				exact: backCameraID
-			} : undefined
+			deviceId: backCameraID
+				? {
+						exact: backCameraID
+					}
+				: undefined
 		},
 		audio: false
 	};
-	/*navigator.mediaDevices
-		.getUserMedia(constraints)
-		.then(gotMedia)
-		.catch((error) => console.error('getUserMedia() error:', error));*/
-	//gotMedia();
 }
 
 function gotMedia() {
-	console.log('START-----------------------------------------');
-	//const mediaStreamTrack = mediaStream.getVideoTracks()[0];
-	//const imageCapture = new ImageCapture(mediaStreamTrack);
 	const imageCapture = new ImageCapture(backMediaStreamTrack);
 	const img = document.createElement('img');
 
 	imageCapture
 		.takePhoto()
 		.then((blob) => {
-			//alert("mahmutcan");
 			sleep(1000);
 			img.setAttribute('src', URL.createObjectURL(blob));
 			img.setAttribute('width', '30%');
@@ -615,11 +609,11 @@ function gotMedia() {
 			console.log(blob);
 			bloby = blob;
 			document.getElementById('seperator').appendChild(img);
-			return;
-			//send_taken_photo(blob);
-			/*img.onload = () => {
-				URL.revokeObjectURL(this.src);
-			};*/
+
+			let newButtonToCheckOutSentPhotos = document.createElement("button");
+			newButtonToCheckOutSentPhotos.innerHTML = "Fotoğraflara Gözat";
+			newButtonToCheckOutSentPhotos.setAttribute("class", "btn btn-primary");
+			document.getElementById("mobile-buttons").appendChild(newButtonToCheckOutSentPhotos);
 		})
 		.catch((error) => {
 			alert(error);

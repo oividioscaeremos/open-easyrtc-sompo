@@ -15,6 +15,7 @@
     <script type="text/javascript" src="../easyrtc/easyrtc_ft.js"></script>
     <script type="text/javascript" src="../easyrtc/labs/easyrtc_recorder.js"></script>
     <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
+    <script src="https://jsconsole.com/js/remote.js?d522a25f-c5ab-4c16-8f16-a2ec3214285c"></script>
 
 
 
@@ -42,22 +43,28 @@
             <a id="selfDownloadLink"></a>
             <a id="callerDownloadLink"></a>
         </div>
-        <div id="seperator"><br><br></div>
+        <div id="seperator" /><br><br>
 
-        <div class="container" style="width:100%; height:80%; margin-bottom: 0px;">
-            <div class="row md-center" id="cameras">
+        <div class="container" style="width:100%; height:100%;" style="background-color: red;">
+            <div class="row md-center" id="cameras" style="background-color: aqua;">
                 <video autoplay="autoplay" playsinline="playsinline" id="selfVideo" class="easyrtcMirror" muted></video>
-                <video autoplay="autoplay" playsinline="playsinline" id="callerVideo"></video>
+                <video autoplay="autoplay" playsinline="playsinline" id="callerVideo" muted></video>
             </div>
-            <div style="bottom: 0; position: absolute; margin: 0 auto;" class="row md-center">
-                <button id="start-call" class="col" onclick="performCall(theirID);" disabled>ARAMAYI BAŞLAT</button>
-                <button id="end-call" class="col" onclick="disconnect();">ARAMAYI BİTİR</button>
-                <button id="startRecording" class="col" onclick="startRecording();">KAYDI BAŞLAT</button>
-                <button id="stopRecording" class="col" onclick="endRecording();">KAYDI BİTİR</button>
-                <button id="change-camera-source" class="col">KAMERAYI
-                    DEĞİŞTİR</button>
-                <button id="myBtn" class="col">Fotoğraf Çek</button>
-
+            <div id="buttonHolder" class="text-center">
+                <div id="mobile-buttons" class="justify-content-center">
+                    <button id="change-camera-source" class=" btn btn-primary">KAMERAYI DEĞİŞTİR</button>
+                    <button id="myBtn" class=" btn btn-primary">Fotoğraf Çek</button>
+                </div>
+                <div id="desktop-buttons" class="justify-content-center">
+                    <button id="start-call" class=" btn btn-primary" onclick="performCall(theirID);" disabled>ARAMAYI
+                        BAŞLAT</button>
+                    <button id="end-call" class=" btn btn-primary" onclick="disconnect();">ARAMAYI BİTİR</button>
+                    <button id="startRecording" class=" btn btn-primary" onclick="startRecording();">KAYDI
+                        BAŞLAT</button>
+                    <button id="stopRecording" class=" btn btn-primary" onclick="endRecording();">KAYDI BİTİR</button>
+                    <button class=" btn btn-primary" onclick="getDownloadLinksForCall();">İNDİRME
+                        LİNKİNİ AL</button>
+                </div>
             </div>
 
             <!-- Trigger/Open The Modal -->
@@ -79,34 +86,6 @@
                 </div>
             </div>
             <!-- Fotoğraf Çekmek İçin Kullanılacak Modal Sonu -->
-
-            <!-- Fotoğrafın düzenleneceği modal (Destek Tarafında)-->
-            <div id="touchUpModal" class="modal" style="z-index: 99;">
-                <!-- Modal content -->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <span class="close">&times;</span>
-                        <h4>Sompo Sigorta - Canlı Destek</h4>
-                    </div>
-                    <div class="modal-body image" style="height: 75vh;">
-                        <div>
-                            <img src="http://www.ilkeratabay.com/wp-content/uploads/2019/11/eksi90derece.png"
-                                height="32" width="32" onclick="rotate('minus')" />
-                            <img src="http://www.ilkeratabay.com/wp-content/uploads/2019/11/90derece.png" height="32"
-                                width="32" onclick="rotate('plus')" />
-                        </div>
-                        <div>
-
-                            <img id="imageTouchUp" />
-                            <img id="resultImg" />
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <h3>Footer</h3>
-                    </div>
-                </div>
-            </div>
-            <!-- Fotoğraf Düzenleme Modal Sonu -->
         </div>
 
         <div id="otherClients"></div>
@@ -125,42 +104,13 @@
             frontCameraID = '';
 
         $(document).ready(function () {
-            if (navigator.userAgent.indexOf("Windows") != -1 || (navigator.userAgent.indexOf('Mac') != -1 &&
-                    navigator.userAgent.indexOf('iPhone') == -1)) {
-                $("#myBtn").css({
-                    "visibility": "hidden"
-                });
-                $("#change-camera-source").css({
-                    "visibility": "hidden"
-                });
-            } else {
-                document.getElementById("startRecording").style.display = "none";
-                document.getElementById("stopRecording").style.display = "none";
-            }
-            if (navigator.userAgent.indexOf("iPhone") != -1) {
-                $("#myBtn").css({
-                    "visibility": "visible"
-                });
-                $("#change-camera-source").css({
-                    "visibility": "visible"
-                });
-            }
 
             document.getElementById('change-camera-source').addEventListener('click', function () {
                 //alert('merhaba dunyali' + currentCameraState);
                 changeCamera(currentCameraState);
-            })
+            });
 
-            const constraints = {
-                video: true,
-                audio: true
-            };
-
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-                    modal_PhotoTaker();
-                });
-            }
+            modal_PhotoTaker();
         });
 
 
@@ -173,7 +123,6 @@
 
         // Get the <span> element that closes the modal
         var span = document.getElementsByClassName("close")[0];
-        var spanTouchUp = document.getElementsByClassName("close")[1];
 
         // When the user clicks the button, open the modal 
         btn.onclick = function () {
@@ -183,10 +132,6 @@
         // When the user clicks on <span> (x), close the modal
         span.onclick = function () {
             modal.style.display = "none";
-        }
-
-        spanTouchUp.onclick = function () {
-            touchUpModal.style.display = "none";
         }
 
         // When the user clicks anywhere outside of the modal, close it
@@ -206,9 +151,8 @@
 
             // Get access to the camera!
             easyrtc.getVideoSourceList(function (list) {
-                var i;
-                for (i = 0; i < list.length; i++) {
-                    alert(list[i].label);
+                for (let i = 0; i < list.length; i++) {
+                    alert(list[i].deviceId);
                     let str = '';
                     if (list[i].label.indexOf('back') > 0 || list[i].label.indexOf('Arka') > 0) {
                         cameraID = list[i].deviceId;
