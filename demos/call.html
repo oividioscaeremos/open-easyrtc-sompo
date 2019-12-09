@@ -160,6 +160,7 @@
                 function(){
                     navigator.mediaDevices.enumerateDevices().then(
                         function (values) {
+                            alert(JSON.stringify(values));
                             values.forEach(
                                 v => {
                                     if (v.kind == "videoinput" && v.label.toLocaleLowerCase('TR').match(/arka|back/g).length > 0) {
