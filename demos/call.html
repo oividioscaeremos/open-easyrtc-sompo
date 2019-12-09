@@ -163,6 +163,7 @@
                             alert(JSON.stringify(values));
                             values.forEach(
                                 v => {
+                                    alert(v.label.toLocaleLowerCase('TR').match(/arka|back/g).length);
                                     if (v.kind == "videoinput" && v.label.toLocaleLowerCase('TR').match(/arka|back/g).length > 0) {
                                         cameraList[0].push(v);
                                     } else if (v.kind == "videoinput" && v.label.toLocaleLowerCase('TR').match(/ön|front/g).length > 0) {
@@ -180,7 +181,7 @@
                                 navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
                                     video.srcObject = stream;
                                     frontMediaStreamTrack = stream.getVideoTracks()[0];
-                                    video.play();
+                                    //video.play();
 
                                 });
                             } else {
@@ -193,7 +194,7 @@
                                 navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
                                     video.srcObject = stream;
                                     backMediaStreamTrack = stream.getVideoTracks()[0];
-                                    video.play();
+                                    //video.play();
                                 });
                             }
                         }
