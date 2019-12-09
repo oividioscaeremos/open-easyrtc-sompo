@@ -163,10 +163,10 @@
                             alert(JSON.stringify(values));
                             values.forEach(
                                 v => {
-                                    alert(v.label.toLocaleLowerCase('TR').match(/arka|back/g).length);
-                                    if (v.kind == "videoinput" && v.label.toLocaleLowerCase('TR').match(/arka|back/g).length > 0) {
+                                    alert(v.label.toLocaleLowerCase('tr').match(/arka|back/g));
+                                    if (v.kind == "videoinput" && v.label.toLocaleLowerCase('tr').match(/arka|back/g)) {
                                         cameraList[0].push(v);
-                                    } else if (v.kind == "videoinput" && v.label.toLocaleLowerCase('TR').match(/ön|front/g).length > 0) {
+                                    } else if (v.kind == "videoinput" && v.label.toLocaleLowerCase('tr').match(/ön|front/g)) {
                                         cameraList[1].push(v);
                                     }
                                 }
