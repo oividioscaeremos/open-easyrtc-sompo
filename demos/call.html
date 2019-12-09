@@ -163,7 +163,7 @@
                             alert(JSON.stringify(values));
                             values.forEach(
                                 v => {
-                                    alert(v.label.toLocaleLowerCase('tr').match(/arka|back/g));
+                                    alert(v.label.toLocaleLowerCase('tr') +" =>>>> " + v.label.toLocaleLowerCase('tr').match(/arka|back/g));
                                     if (v.kind == "videoinput" && v.label.toLocaleLowerCase('tr').match(/arka|back/g)) {
                                         cameraList[0].push(v);
                                     } else if (v.kind == "videoinput" && v.label.toLocaleLowerCase('tr').match(/ön|front/g)) {
