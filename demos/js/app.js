@@ -77,7 +77,8 @@ function closeNav() {
 /*SIDEBAR İÇİN FONKSİYONLAR */
 
 function detectmob() {
-	if (navigator.userAgent.match(/Android/i) ||
+	if (
+		navigator.userAgent.match(/Android/i) ||
 		navigator.userAgent.match(/webOS/i) ||
 		navigator.userAgent.match(/iPhone/i) ||
 		navigator.userAgent.match(/iPad/i) ||
@@ -91,49 +92,54 @@ function detectmob() {
 	}
 }
 
-function checkDeviceAndOrganizeButtons(){
-	if(detectmob()){
-		console.log("mobilsin");
-		$("#desktop-buttons").empty();
-		$("#mobile-buttons").css({
-			"bottom": "0px",
-			"position": "absolute"
+function checkDeviceAndOrganizeButtons() {
+	if (detectmob()) {
+		console.log('mobilsin');
+		$('#desktop-buttons').empty();
+		$('#mobile-buttons').css({
+			bottom: '0px',
+			position: 'absolute'
 		});
-	}else{
-		console.log("desktopsın");
-		$("#mobile-buttons").empty();
+	} else {
+		console.log('desktopsın');
+		$('#mobile-buttons').empty();
 	}
 }
 
-
 function connect() {
+	/*navigator.mediaDevices.enumerateDevices().then(function(values) {
+		values.forEach((v) => {
+			if (v.kind == 'videoinput') {
+				alert(JSON.stringify(v));
+			}
+		});
+	});*/
 
 	checkDeviceAndOrganizeButtons();
 
 	var previousOrientation = window.orientation;
 
-	var checkOrientation = function () {
+	var checkOrientation = function() {
 		if (window.orientation !== previousOrientation) {
 			previousOrientation = window.orientation;
-			if(window.orientation == -90){
-				$("#mobile-buttons").css({
-					"width" : "20%",
-					"right":"0px",
+			if (window.orientation == -90) {
+				$('#mobile-buttons').css({
+					width: '20%',
+					right: '0px'
 				});
-			}else if(window.orientation == 90){
-				
-			}else{
-				$("#mobile-buttons").css({
-					"width": "100%",
-					"bottom": "0px",
-					"position":"absolute"
+			} else if (window.orientation == 90) {
+			} else {
+				$('#mobile-buttons').css({
+					width: '100%',
+					bottom: '0px',
+					position: 'absolute'
 				});
 			}
 		}
 	};
 
-	window.addEventListener("resize", checkOrientation, false);
-	window.addEventListener("orientationchange", checkOrientation, false);
+	window.addEventListener('resize', checkOrientation, false);
+	window.addEventListener('orientationchange', checkOrientation, false);
 	setInterval(checkOrientation, 2000);
 
 	easyrtc.enableDataChannels(true);
@@ -157,7 +163,7 @@ function connect() {
 	//easyrtc.connect('easyrtc.dataFileTransfer', loginSuccess, loginFailure);
 	//easyrtc.easyApp('easyrtc.dataFileTransfer', 'selfVideo', [ 'callerVideo' ], loginSuccess, loginFailure);
 	sleep(1000);
-	easyrtc.easyApp('easyrtc.videoChatHd', 'selfVideo', ['callerVideo'], loginSuccess, loginFailure);
+	easyrtc.easyApp('easyrtc.videoChatHd', 'selfVideo', [ 'callerVideo' ], loginSuccess, loginFailure);
 }
 
 function disconnect() {
@@ -284,9 +290,11 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 			button.onclick = (function(easyrtcid) {
 				return function() {
 					performCall(easyrtcid);
-					easyrtc.setOnHangup(function(easyrtcid, slot) {
-						document.getElementById('start-call').disabled = true;
-					});
+					if (!detectmob()) {
+						easyrtc.setOnHangup(function(easyrtcid, slot) {
+							document.getElementById('start-call').disabled = true;
+						});
+					}
 				};
 			})(easyrtcid);
 
@@ -427,7 +435,7 @@ $('#rotater').on('click', function() {
 
 			for (var i = 1; i < recentUndoStack.length; i++) {
 				var anImage = new Image();
-				console.log("Im here");
+				console.log('Im here');
 				anImage.onload = function() {
 					ctx.drawImage(this, 0, 0, this.width, this.height);
 				};
@@ -529,7 +537,7 @@ function loginSuccess(easyrtcid) {
 		navigator.userAgent.indexOf('Windows') != -1 ||
 		(navigator.userAgent.indexOf('Mac') != -1 && navigator.userAgent.indexOf('iPhone') == -1)
 	) {
-		alert("mahmut");
+		alert('mahmut');
 		let tracks = $('#selfVideo')[0].srcObject.getVideoTracks();
 		tracks.forEach((t) => {
 			t.enabled = false;
@@ -610,10 +618,10 @@ function gotMedia() {
 			bloby = blob;
 			document.getElementById('seperator').appendChild(img);
 
-			let newButtonToCheckOutSentPhotos = document.createElement("button");
-			newButtonToCheckOutSentPhotos.innerHTML = "Fotoğraflara Gözat";
-			newButtonToCheckOutSentPhotos.setAttribute("class", "btn btn-primary");
-			document.getElementById("mobile-buttons").appendChild(newButtonToCheckOutSentPhotos);
+			let newButtonToCheckOutSentPhotos = document.createElement('button');
+			newButtonToCheckOutSentPhotos.innerHTML = 'Fotoğraflara Gözat';
+			newButtonToCheckOutSentPhotos.setAttribute('class', 'btn btn-primary');
+			document.getElementById('mobile-buttons').appendChild(newButtonToCheckOutSentPhotos);
 		})
 		.catch((error) => {
 			alert(error);

@@ -148,16 +148,114 @@
             // camera usage
             // Grab elements, create settings, etc.
             var video = document.getElementById('video');
-
+            let cameraList = [
+                [],
+                []
+            ];
             // Get access to the camera!
-            easyrtc.getVideoSourceList(function (list) {
-                for (let i = 0; i < list.length; i++) {
-                    alert(list[i].deviceId);
-                    let str = '';
+            navigator.mediaDevices.getUserMedia({
+                video:true,
+                audio:true
+            }).then(
+                function(){
+                    navigator.mediaDevices.enumerateDevices().then(
+                        function (values) {
+                            values.forEach(
+                                v => {
+                                    if (v.kind == "videoinput" && v.label.toLocaleLowerCase('TR').match(/arka|back/g).length > 0) {
+                                        cameraList[0].push(v);
+                                    } else if (v.kind == "videoinput" && v.label.toLocaleLowerCase('TR').match(/ön|front/g).length > 0) {
+                                        cameraList[1].push(v);
+                                    }
+                                }
+                            );
+                            if (cameraList[0].length == 0) {
+                                let constraints = {
+                                    video: {
+                                        deviceId: cameraList[1][0].deviceId
+                                    },
+                                    audio: undefined
+                                }
+                                navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+                                    video.srcObject = stream;
+                                    frontMediaStreamTrack = stream.getVideoTracks()[0];
+                                    video.play();
+
+                                });
+                            } else {
+                                let constraints = {
+                                    video: {
+                                        deviceId: cameraList[0][0].deviceId
+                                    },
+                                    audio: undefined
+                                }
+                                navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+                                    video.srcObject = stream;
+                                    backMediaStreamTrack = stream.getVideoTracks()[0];
+                                    video.play();
+                                });
+                            }
+                        }
+                    )
+                }
+            );
+
+            /*easyrtc.getVideoSourceList(function (list) {
+                        let constraints, cameraName, label, found = false;
+                        console.log(list);
+                        list.map(listElement => {
+                            console.log(listElement.label);
+                            if (listElement.label.indexOf('back') > 0 || list.label.indexOf('Arka') > 0) {
+
+                                constraints = {
+                                    video: {
+                                        deviceId: cameraID
+                                    },
+                                    audio: undefined
+                                }
+                                navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+                                    video.srcObject = stream;
+                                    backMediaStreamTrack = stream.getVideoTracks()[0];
+
+                                    video.play();
+
+                                });
+
+                                found = true;
+                            }
+                        });
+
+
+                        list.map(listElement => {
+                            if (listElement.label.indexOf('front') > 0 || list.label.indexOf('Ön') > 0) {
+                                constraints = {
+                                    video: {
+                                        deviceId: cameraID
+                                    },
+                                    audio: undefined
+                                }
+                                navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+
+                                    frontMediaStreamTrack = stream.getVideoTracks()[0];
+                                    if (!found) {
+                                        video.srcObject = stream;
+                                        video.play();
+                                    }
+                                });
+
+                                found = true;
+                            }
+                        });
+
+
+
+                        /*for (let i = 0; i < list.length; i++) {
+                    alert(JSON.stringify(list[i]));
                     if (list[i].label.indexOf('back') > 0 || list[i].label.indexOf('Arka') > 0) {
                         cameraID = list[i].deviceId;
                         backCameraID = list[i].deviceId;
-                        const constraints = {
+                        cameraName = "back";
+                        constraints = {
                             video: {
                                 deviceId: cameraID ? {
                                     exact: cameraID
@@ -165,16 +263,13 @@
                             },
                             audio: undefined
                         };
-                        navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-                            video.srcObject = stream;
-                            backMediaStreamTrack = stream.getVideoTracks()[0];
-                            video.play();
-                        });
+                        label = list[i].label;
                         break;
                     } else {
                         cameraID = list[i].deviceId;
                         frontCameraID = list[i].deviceId;
-                        const constraints = {
+                        cameraName = "front";
+                        constraints = {
                             video: {
                                 width: 720,
                                 height: 1080,
@@ -184,15 +279,32 @@
                             },
                             audio: undefined
                         };
-                        navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-                            video.srcObject = stream;
-                            frontMediaStreamTrack = stream.getVideoTracks()[0];
-                            video.play();
-                        });
+                        label = list[i].label;
+
                     }
+
+                    navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+                        video.srcObject = stream;
+                        if (cameraName == "back") {
+                            backMediaStreamTrack = stream.getVideoTracks()[0];
+                        } else {
+                            frontMediaStreamTrack = stream.getVideoTracks()[0];
+                        }
+                        console.log(backMediaStreamTrack);
+                        console.log(frontMediaStreamTrack);
+                        console.log(stream);
+                        let playPromise = video.play();
+                        if (playPromise != undefined) {
+                            playPromise.then(_ =>
+                                video.play()
+                            );
+                        }
+
+                    });
                 }
             });
 
+            });*/
         }
     </script>
 
