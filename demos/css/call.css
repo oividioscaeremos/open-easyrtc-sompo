@@ -1,12 +1,15 @@
+html,
+body {
+    touch-action: auto;
+}
+
 #selfVideo {
     volume: 0;
-    position: absolute;
+    position: fixed;
     left: 10px;
-    top: 20%;
+    top: 12%;
     z-index: 2;
-    opacity: 0.8;
-    height: 120px;
-    width: 160px;
+    opacity: 1;
 }
 
 
@@ -93,7 +96,7 @@
 /* The Close Button */
 .close {
     color: white;
-    float: right;
+    float: left;
     font-size: 28px;
     font-weight: bold;
 }
@@ -106,19 +109,18 @@
 }
 
 .modal-header {
-    padding: 2px 16px;
-    background-color: #5cb85c;
+    padding: 5px 10px;
+    background-color: #d90434;
     color: white;
+    text-align: center;
 }
 
 .modal-body {
     padding: 2px 16px;
 }
 
-.modal-footer {
-    padding: 2px 16px;
-    background-color: #5cb85c;
-    color: white;
+.divider {
+    width: 20px;
 }
 
 .rotateimg90 {
@@ -138,44 +140,6 @@
     -ms-transform-origin: left bottom;
     -o-transform-origin: left bottom;
     transform-origin: left bottom;
-}
-
-.rotateimg180 {
-    -webkit-transform: translateY(-100%) rotate(180deg);
-    /* Safari */
-    -moz-transform: translateY(-100%) rotate(180deg);
-    /* Firefox 3.6 Firefox 4 */
-    /*-moz-transform-origin: right top; */
-    -ms-transform: translateY(-100%) rotate(180deg);
-    /* IE9 */
-    -o-transform: translateY(-100%) rotate(180deg);
-    /* Opera */
-    transform: translateY(-100%) rotate(180deg);
-    /* W3C */
-    -webkit-transform-origin: bottom;
-    -moz-transform-origin: bottom;
-    -ms-transform-origin: bottom;
-    -o-transform-origin: bottom;
-    transform-origin: bottom;
-}
-
-.rotateimgminus90 {
-    -webkit-transform: translateX(-100%) rotate(-90deg);
-    /* Safari */
-    -moz-transform: translateX(-100%) rotate(-90deg);
-    /* Firefox 3.6 Firefox 4 */
-    /*-moz-transform-origin: right top; */
-    -ms-transform: translateX(-100%) rotate(-90deg);
-    /* IE9 */
-    -o-transform: translateX(-100%) rotate(-90deg);
-    /* Opera */
-    transform: translateX(-100%) rotate(-90deg);
-    /* W3C */
-    -webkit-transform-origin: right top;
-    -moz-transform-origin: right top;
-    -ms-transform-origin: right top;
-    -o-transform-origin: right top;
-    transform-origin: right top;
 }
 
 /*SIDEBAR KISMI BURASI*/
@@ -217,5 +181,43 @@
 }
 
 #buttonHolder {
-    margin-bottom: 0px;
+    bottom: 10px;
+    position: fixed;
+    overflow: hidden;
 }
+
+/* NavBar */
+
+.navbar {
+    overflow: hidden;
+    background-color: #6e1313;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar a {
+    float: left;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.navbar a:hover {
+    background: #f1f1f1;
+    color: #d90434;
+}
+
+.navbar a.active {
+    background-color: #f1f1f1;
+    color: #d90434;
+}
+
+/* NavBar ---> */

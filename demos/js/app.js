@@ -26,14 +26,12 @@
 var selfEasyrtcid = '';
 var peers = {};
 let currentCameraState = 'front';
-var dropArea = document.createElement('div');
 var bloby = new Blob();
 var fileSender = null;
 var fileInput,
 	fileNames = new Array('');
-var supportsRecording;
-var touchUpModal = document.getElementById('touchUpModal');
 var drawer;
+var backTrack;
 
 function buildPeerBlockName(easyrtcid) {
 	return 'peerzone_' + easyrtcid;
@@ -77,15 +75,7 @@ function closeNav() {
 /*SIDEBAR İÇİN FONKSİYONLAR */
 
 function detectmob() {
-	if (
-		navigator.userAgent.match(/Android/i) ||
-		navigator.userAgent.match(/webOS/i) ||
-		navigator.userAgent.match(/iPhone/i) ||
-		navigator.userAgent.match(/iPad/i) ||
-		navigator.userAgent.match(/iPod/i) ||
-		navigator.userAgent.match(/BlackBerry/i) ||
-		navigator.userAgent.match(/Windows Phone/i)
-	) {
+	if (navigator.userAgent.match(/Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone/i)) {
 		return true;
 	} else {
 		return false;
@@ -94,54 +84,57 @@ function detectmob() {
 
 function checkDeviceAndOrganizeButtons() {
 	if (detectmob()) {
-		console.log('mobilsin');
-		$('#desktop-buttons').empty();
+		$('#desktop-buttons').remove();
 		$('#mobile-buttons').css({
-			bottom: '0px',
-			position: 'absolute'
+			visibility: 'visible'
 		});
+		$('#selfVideo').attr('width', window.orientation != 0 ? window.innerHeight * 0.8 : window.innerWidth * 0.95);
 	} else {
-		console.log('desktopsın');
-		$('#mobile-buttons').empty();
+		$('#mobile-buttons').remove();
+		$('#desktop-buttons').css({
+			visibility: 'visible'
+		});
 	}
 }
 
 function connect() {
-	/*navigator.mediaDevices.enumerateDevices().then(function(values) {
-		values.forEach((v) => {
-			if (v.kind == 'videoinput') {
-				alert(JSON.stringify(v));
-			}
-		});
-	});*/
-
 	checkDeviceAndOrganizeButtons();
 
 	var previousOrientation = window.orientation;
 
 	var checkOrientation = function() {
 		if (window.orientation !== previousOrientation) {
-			previousOrientation = window.orientation;
-			if (window.orientation == -90) {
-				$('#mobile-buttons').css({
-					width: '20%',
-					right: '0px'
-				});
-			} else if (window.orientation == 90) {
+			if (window.orientation == -90 || window.orientation == 90) {
+				if (window.orientation != -previousOrientation) {
+					$('#selfVideo').css({
+						width: window.innerHeight * 0.4,
+						top: '5%'
+					});
+				}
 			} else {
-				$('#mobile-buttons').css({
-					width: '100%',
-					bottom: '0px',
-					position: 'absolute'
-				});
+				console.log('döndükten sonra');
+				if (window.orientation != -previousOrientation) {
+					$('#selfVideo').css({
+						width: window.innerWidth * 0.45,
+						top: '5%'
+					});
+				}
 			}
+			previousOrientation = window.orientation;
 		}
 	};
 
 	window.addEventListener('resize', checkOrientation, false);
 	window.addEventListener('orientationchange', checkOrientation, false);
 	setInterval(checkOrientation, 2000);
+	setInterval(checkSrcObject, 5000);
 
+	function checkSrcObject(){
+		if (document.getElementById('selfVideo').srcObject != undefined && backTrack == undefined){
+			alert('im here')
+			modal_PhotoTaker();
+		}
+	}
 	easyrtc.enableDataChannels(true);
 
 	easyrtc.setRoomOccupantListener(convertListToButtons);
@@ -162,8 +155,8 @@ function connect() {
 
 	//easyrtc.connect('easyrtc.dataFileTransfer', loginSuccess, loginFailure);
 	//easyrtc.easyApp('easyrtc.dataFileTransfer', 'selfVideo', [ 'callerVideo' ], loginSuccess, loginFailure);
-	sleep(1000);
 	easyrtc.easyApp('easyrtc.videoChatHd', 'selfVideo', [ 'callerVideo' ], loginSuccess, loginFailure);
+
 }
 
 function disconnect() {
@@ -286,18 +279,19 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 		if (!peers[easyrtcid]) {
 			var button = document.getElementById('start-call');
 			theirID = easyrtcid;
-			button.disabled = false;
-			button.onclick = (function(easyrtcid) {
-				return function() {
-					performCall(easyrtcid);
-					if (!detectmob()) {
-						easyrtc.setOnHangup(function(easyrtcid, slot) {
-							document.getElementById('start-call').disabled = true;
-						});
-					}
-				};
-			})(easyrtcid);
-
+			if (!detectmob()) {
+				button.disabled = false;
+				button.onclick = (function(easyrtcid) {
+					return function() {
+						performCall(easyrtcid);
+						if (!detectmob()) {
+							easyrtc.setOnHangup(function(easyrtcid, slot) {
+								document.getElementById('start-call').disabled = true;
+							});
+						}
+					};
+				})(easyrtcid);
+			}
 			var peerBlock = document.createElement('div');
 			peerBlock.id = buildPeerBlockName(easyrtcid);
 			peerBlock.className = 'peerblock';
@@ -458,21 +452,19 @@ $('#rotater').on('click', function() {
 
 /*BU KISIMDA DRAWR'DA OLMAYAN ROTATE METODUNU YAZDIM ---!>*/
 
-function touchUpOnPhoto(photoBlob, name) {
+function touchUpOnPhoto(src, name) {
 	openNav();
-
 	var photoToEdit = new Image();
 	drawer = document.getElementById('touchUpCanvasForDrawing');
 	var ctx = drawer.getContext('2d');
-	photoToEdit.onload = async function() {
-		photoToEdit = await loadImage(URL.createObjectURL(photoBlob));
-
-		const scale = $('.modal-body.image').height() * 100 / this.width;
-		this.width = $('.modal-body.image').height();
+	photoToEdit.onload = function() {
+		const scale = $(window).height() * 100 / this.width;
+		this.width = $(window).height();
 		this.height = this.height * (scale / 100);
+
 		$(drawer).drawr({
 			enable_tranparency: false,
-			canvas_width: this.width,
+			canvas_width: this.width + 100,
 			canvas_height: this.height,
 			undo_max_levels: 100
 		});
@@ -507,8 +499,7 @@ function touchUpOnPhoto(photoBlob, name) {
 
 		closeNav();
 	});
-
-	photoToEdit.src = URL.createObjectURL(photoBlob);
+	photoToEdit.src = src;
 }
 
 function blobAcceptor(otherGuy, blob, filename) {
@@ -523,7 +514,7 @@ function blobAcceptor(otherGuy, blob, filename) {
 	image.setAttribute('width', '10%');
 	image.setAttribute('height', 'auto');
 	image.addEventListener('click', function() {
-		touchUpOnPhoto(blob, filename);
+		touchUpOnPhoto(image.src, filename);
 	});
 	document.getElementById('peerZone').appendChild(image);
 }
@@ -537,7 +528,6 @@ function loginSuccess(easyrtcid) {
 		navigator.userAgent.indexOf('Windows') != -1 ||
 		(navigator.userAgent.indexOf('Mac') != -1 && navigator.userAgent.indexOf('iPhone') == -1)
 	) {
-		alert('mahmut');
 		let tracks = $('#selfVideo')[0].srcObject.getVideoTracks();
 		tracks.forEach((t) => {
 			t.enabled = false;
@@ -547,12 +537,6 @@ function loginSuccess(easyrtcid) {
 			left: '-9999999px'
 		});
 	} else {
-		$('#selfVideo').width('80%');
-		$('#selfVideo').height('auto');
-		$('#selfVideo').css({
-			margin: '0 auto',
-			display: 'block'
-		});
 		$('#callerVideo').css({
 			left: '-99999px',
 			position: 'absolute'
@@ -567,20 +551,26 @@ function loginFailure(errorCode, message) {
 // Aşağıdaki kodlar telefonu tutan kişinin arka kamerasıyla fotoğraf çekebilmesi ve görüntülü konuşmada kamera değiştirilebilmesi içindir;
 
 function changeCamera(curr) {
+	alert('youre literally trying to change cameras and ill not let you do that.');
 	let stream = $('#selfVideo')[0].srcObject;
 	let tracks = stream.getVideoTracks();
 	if (currentCameraState == 'front') {
+		document.getElementById('camera-source').innerHTML = 'camera_front';
 		tracks.map((t) => {
 			stream.removeTrack(t);
 			stream.addTrack(backMediaStreamTrack);
 		});
+		$('#selfVideo').removeClass('easyrtcMirror');
 		easyrtc.renegotiate(theirID);
 		currentCameraState = 'back';
 	} else {
+		document.getElementById('camera-source').innerHTML = 'camera_rear';
+
 		tracks.map((t) => {
 			stream.removeTrack(t);
 			stream.addTrack(frontMediaStreamTrack);
 		});
+		$('#selfVideo').addClass('easyrtcMirror');
 		easyrtc.renegotiate(theirID);
 		currentCameraState = 'front';
 	}
@@ -604,6 +594,7 @@ function take_photo() {
 }
 
 function gotMedia() {
+	console.log(backMediaStreamTrack);
 	const imageCapture = new ImageCapture(backMediaStreamTrack);
 	const img = document.createElement('img');
 
@@ -618,10 +609,7 @@ function gotMedia() {
 			bloby = blob;
 			document.getElementById('seperator').appendChild(img);
 
-			let newButtonToCheckOutSentPhotos = document.createElement('button');
-			newButtonToCheckOutSentPhotos.innerHTML = 'Fotoğraflara Gözat';
-			newButtonToCheckOutSentPhotos.setAttribute('class', 'btn btn-primary');
-			document.getElementById('mobile-buttons').appendChild(newButtonToCheckOutSentPhotos);
+			//document.
 		})
 		.catch((error) => {
 			alert(error);
@@ -682,3 +670,7 @@ function endRecording() {
 }
 
 /* KAYIT (RECORDING) İŞLEMİ İÇİN BLOK BİTİŞ*/
+
+/* <!--- Müşteri Tarafında Çekilmiş Fotoğrafları Göstermek İçin Kullanılan Blok */
+function showTakenPhotosModal() {}
+/* Müşteri Tarafında Çekilmiş Fotoğrafları Göstermek İçin Kullanılan Blok Sonu ---!>*/

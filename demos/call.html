@@ -10,6 +10,7 @@
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="css/call.css">
     <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.5.95/css/materialdesignicons.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="../easyrtc/easyrtc.js"></script>
     <script type="text/javascript" src="../easyrtc/easyrtc_ft.js"></script>
@@ -36,56 +37,81 @@
             <button id="saveChanges">Kaydet</button>
         </div>
     </div>
+    <div class="navbar">
+        <div id="mobile-buttons" style="visibility:hidden;">
+            <button id="change-camera-source" class=" btn btn-light"><i id="camera-source" class="material-icons">
+                    camera_rear
+                </i></button>
+            <button id="takePhotoBtn" class=" btn btn-light"><i class="material-icons">
+                    add_a_photo
+                </i></button>
+            <button id="photos" class=" btn btn-light" onclick="showTakenPhotosModal()"><i class="material-icons">
+                    collections
+                </i></button>
+        </div>
+        <div id="desktop-buttons" style="visibility:hidden;">
+            <button id="start-call" class=" btn btn-light" onclick="performCall(theirID);" disabled>ARAMAYI
+                BAŞLAT</button>
+            <button id="end-call" class=" btn btn-light" onclick="disconnect();">ARAMAYI BİTİR</button>
+            <button id="startRecording" class=" btn btn-light" onclick="startRecording();">KAYDI
+                BAŞLAT</button>
+            <button id="stopRecording" class=" btn btn-light" onclick="endRecording();">KAYDI
+                BİTİR</button>
+            <button class=" btn btn-light" onclick="getDownloadLinksForCall();">İNDİRME
+                LİNKİNİ AL</button>
+        </div>
+        <a id="selfDownloadLink"></a>
+        <a id="callerDownloadLink"></a>
+    </div>
     <div id="wholeContent">
         <div id="peerZone" style="width: 100%; height: 20%; margin-top: 0px;">
-        </div>
-        <div id="recordings">
-            <a id="selfDownloadLink"></a>
-            <a id="callerDownloadLink"></a>
         </div>
         <div id="seperator" /><br><br>
 
         <div class="container" style="width:100%; height:100%;" style="background-color: red;">
-            <div class="row md-center" id="cameras" style="background-color: aqua;">
-                <video autoplay="autoplay" playsinline="playsinline" id="selfVideo" class="easyrtcMirror" muted></video>
+            <div class="row md-center" id="cameras" style="background-color: #6e1313;">
+                <video autoplay="autoplay" playsinline="playsinline" id="selfVideo" class="easyrtcMirror"
+                    style="top: 0px; position:absolute;" muted></video>
                 <video autoplay="autoplay" playsinline="playsinline" id="callerVideo" muted></video>
             </div>
-            <div id="buttonHolder" class="text-center">
-                <div id="mobile-buttons" class="justify-content-center">
-                    <button id="change-camera-source" class=" btn btn-primary">KAMERAYI DEĞİŞTİR</button>
-                    <button id="myBtn" class=" btn btn-primary">Fotoğraf Çek</button>
-                </div>
-                <div id="desktop-buttons" class="justify-content-center">
-                    <button id="start-call" class=" btn btn-primary" onclick="performCall(theirID);" disabled>ARAMAYI
-                        BAŞLAT</button>
-                    <button id="end-call" class=" btn btn-primary" onclick="disconnect();">ARAMAYI BİTİR</button>
-                    <button id="startRecording" class=" btn btn-primary" onclick="startRecording();">KAYDI
-                        BAŞLAT</button>
-                    <button id="stopRecording" class=" btn btn-primary" onclick="endRecording();">KAYDI BİTİR</button>
-                    <button class=" btn btn-primary" onclick="getDownloadLinksForCall();">İNDİRME
-                        LİNKİNİ AL</button>
-                </div>
-            </div>
-
-            <!-- Trigger/Open The Modal -->
             <!-- Fotoğraf Çekmek İçin Kullanılacak Olan Modal (Mobil Tarafta)-->
-            <div id="myModal" class="modal" style="z-index: 99;">
+            <div id="takePhotoModal" class="modal" style="z-index: 99;">
                 <!-- Modal content -->
                 <div class="modal-content">
                     <div class="modal-header">
                         <span class="close">&times;</span>
-                        <h4>Sompo Sigorta - Canlı Destek</h4>
+                        <span class="divider">&nbsp;</span>
+                        <h5>Sompo Sigorta - Canlı Destek</h5>
                     </div>
                     <div class="modal-body">
                         <video id="video" style="margin: 0 auto; width: 100%; height: auto;" autoplay muted></video>
                         <div><button id='take-a-photo' onclick="gotMedia()">Fotoğraf Çek</button></div>
                     </div>
-                    <div class="modal-footer">
-                        <h3></h3>
-                    </div>
                 </div>
             </div>
             <!-- Fotoğraf Çekmek İçin Kullanılacak Modal Sonu -->
+
+            <!-- Müşterinin Çektiği Fotoğrafları Görmesi İçin Kullanılacak Olan Modal (Mobil Tarafta)-->
+            <div id="takenPhotos" class="modal" style="z-index: 99;">
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="close">&times;</span>
+                        <span class="divider">&nbsp;</span>
+                        <h5>Sompo Sigorta <br> &nbsp; Canlı Destek</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
+                            Çektiğiniz fotoğraflar aşağıda gösterilecektir.
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        &nbsp;
+                    </div>
+                </div>
+            </div>
+            <!-- Müşterinin Çektiği Fotoğrafları Görmesi İçin Kullanılacak Modal Sonu -->
         </div>
 
         <div id="otherClients"></div>
@@ -96,6 +122,7 @@
 
 
     <script>
+        let mahmut;
         let ourID = "";
         let theirID = "";
         let frontMediaStreamTrack,
@@ -104,43 +131,49 @@
             frontCameraID = '';
 
         $(document).ready(function () {
-
             document.getElementById('change-camera-source').addEventListener('click', function () {
                 //alert('merhaba dunyali' + currentCameraState);
                 changeCamera(currentCameraState);
             });
 
-            modal_PhotoTaker();
         });
 
 
         // Get the modal
-        var modal = document.getElementById("myModal");
+        var takePhotoModal = document.getElementById("takePhotoModal");
+        var seePhotosModal = document.getElementById("takenPhotos");
 
 
         // Get the button that opens the modal
-        var btn = document.getElementById("myBtn");
+        var takePhotoBtn = document.getElementById("takePhotoBtn");
+        var seePhotosBtn = document.getElementById("photos");
 
         // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
+        var spanTakePhoto = document.getElementsByClassName("close")[0];
+        var spanSeePhoto = document.getElementsByClassName("close")[1];
 
         // When the user clicks the button, open the modal 
-        btn.onclick = function () {
-            modal.style.display = "block";
+        takePhotoBtn.onclick = function () {
+            takePhotoModal.style.display = "block";
+        }
+        seePhotosBtn.onclick = function () {
+            seePhotosModal.style.display = "block";
         }
 
         // When the user clicks on <span> (x), close the modal
-        span.onclick = function () {
-            modal.style.display = "none";
+        spanTakePhoto.onclick = function () {
+            takePhotoModal.style.display = "none";
+        }
+        spanSeePhoto.onclick = function () {
+            seePhotosModal.style.display = "none";
         }
 
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function (event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            } else if (event.target == touchUpModal) {
-                touchUpModal.style.display = "none";
-                document.getElementById('touchUpCanvasForDrawing').undoStack = [];
+            if (event.target == takePhotoModal) {
+                takePhotoModal.style.display = "none";
+            } else if (event.target == seePhotosModal) {
+                seePhotosModal.style.display = "none";
             }
         }
 
@@ -149,164 +182,104 @@
             // Grab elements, create settings, etc.
             var video = document.getElementById('video');
             let cameraList = [
-                [],
-                []
-            ];
+                    [],
+                    []
+                ],
+                constraints;
             // Get access to the camera!
             navigator.mediaDevices.getUserMedia({
-                video:true,
-                audio:true
+                video: {
+                    facingMode: 'environment'
+                },
+                audio: true
             }).then(
-                function(){
-                    navigator.mediaDevices.enumerateDevices().then(
-                        function (values) {
-                            alert(JSON.stringify(values));
-                            values.forEach(
-                                v => {
-                                    alert(v.label.toLocaleLowerCase('tr') +" =>>>> " + v.label.toLocaleLowerCase('tr').match(/arka|back/g));
-                                    if (v.kind == "videoinput" && v.label.toLocaleLowerCase('tr').match(/arka|back/g) != null) {
+                function (stream) {
+                    try {
+                        backMediaStreamTrack = stream.getVideoTracks()[0];
+                        video.srcObject = stream;
+                        video.play();
+                        backTrack = stream;
+                    } catch (err) {
+                        alert(err);
+                    }
+                }
+
+
+                /*navigator.mediaDevices.enumerateDevices().then(
+                    function (values) {
+                        values.forEach(
+                            v => {
+                                if (v.kind == "videoinput") {
+                                    if (v.kind == "videoinput" && v.label.toLocaleLowerCase('tr').match(
+                                            /arka|back/g) != null) {
                                         cameraList[0].push(v);
-                                    } else if (v.kind == "videoinput" && v.label.toLocaleLowerCase('tr').match(/ön|front/g) != null) {
+                                    } else if (v.kind == "videoinput" && v.label.toLocaleLowerCase('tr')
+                                        .match(/ön|front/g) != null) {
                                         cameraList[1].push(v);
                                     }
                                 }
-                            );
-                            if (cameraList[0].length == 0) {
-                                let constraints = {
+                            });
+                        if (cameraList[0] === undefined) {
+                            if (cameraList[1] !== undefined) {
+                                constraints = {
                                     video: {
                                         deviceId: cameraList[1][0].deviceId
                                     },
-                                    audio: undefined
-                                }
-                                navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+                                    audio: false
+                                };
+                                navigator.mediaDevices.getUserMedia(constraints).then(function (
+                                    stream) {
                                     video.srcObject = stream;
                                     frontMediaStreamTrack = stream.getVideoTracks()[0];
-                                    //video.play();
-
-                                });
-                            } else {
-                                let constraints = {
-                                    video: {
-                                        deviceId: cameraList[0][0].deviceId
-                                    },
-                                    audio: undefined
-                                }
-                                navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-                                    video.srcObject = stream;
-                                    backMediaStreamTrack = stream.getVideoTracks()[0];
-                                    //video.play();
-                                });
-                            }
-                        }
-                    )
-                }
-            );
-
-            /*easyrtc.getVideoSourceList(function (list) {
-                        let constraints, cameraName, label, found = false;
-                        console.log(list);
-                        list.map(listElement => {
-                            console.log(listElement.label);
-                            if (listElement.label.indexOf('back') > 0 || list.label.indexOf('Arka') > 0) {
-
-                                constraints = {
-                                    video: {
-                                        deviceId: cameraID
-                                    },
-                                    audio: undefined
-                                }
-                                navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-                                    video.srcObject = stream;
-                                    backMediaStreamTrack = stream.getVideoTracks()[0];
-
                                     video.play();
 
                                 });
-
-                                found = true;
-                            }
-                        });
-
-
-                        list.map(listElement => {
-                            if (listElement.label.indexOf('front') > 0 || list.label.indexOf('Ön') > 0) {
+                            } else {
                                 constraints = {
                                     video: {
-                                        deviceId: cameraID
+                                        deviceId: values.filter(v => v.kind == "videoinput")[0]
+                                            .deviceId
                                     },
-                                    audio: undefined
-                                }
-                                navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-
+                                    audio: false
+                                };
+                                navigator.mediaDevices.getUserMedia(constraints).then(function (
+                                    stream) {
+                                    video.srcObject = stream;
                                     frontMediaStreamTrack = stream.getVideoTracks()[0];
-                                    if (!found) {
-                                        video.srcObject = stream;
-                                        video.play();
-                                    }
+                                    video.play();
+
                                 });
-
-                                found = true;
                             }
-                        });
+                        } else if (cameraList[0] !== undefined) {
+                            constraints = {
+                                video: {
+                                    deviceId: cameraList[0][0].deviceId
+                                },
+                                audio: false
+                            }
 
+                            navigator.mediaDevices.getUserMedia(constraints).then(function (
+                                stream) {
+                                video.srcObject = stream;
+                                backMediaStreamTrack = stream.getVideoTracks()[0];
+                                video.play();
 
-
-                        /*for (let i = 0; i < list.length; i++) {
-                    alert(JSON.stringify(list[i]));
-                    if (list[i].label.indexOf('back') > 0 || list[i].label.indexOf('Arka') > 0) {
-                        cameraID = list[i].deviceId;
-                        backCameraID = list[i].deviceId;
-                        cameraName = "back";
-                        constraints = {
-                            video: {
-                                deviceId: cameraID ? {
-                                    exact: cameraID
-                                } : undefined
-                            },
-                            audio: undefined
-                        };
-                        label = list[i].label;
-                        break;
-                    } else {
-                        cameraID = list[i].deviceId;
-                        frontCameraID = list[i].deviceId;
-                        cameraName = "front";
-                        constraints = {
-                            video: {
-                                width: 720,
-                                height: 1080,
-                                deviceId: cameraID ? {
-                                    exact: cameraID
-                                } : undefined
-                            },
-                            audio: undefined
-                        };
-                        label = list[i].label;
-
+                                constraints = {
+                                    video: {
+                                        deviceId: cameraList[1][0].deviceId
+                                    },
+                                    audio: false
+                                };
+                                navigator.mediaDevices.getUserMedia(constraints).then(function (
+                                    stream) {
+                                    frontMediaStreamTrack = stream.getVideoTracks()[0];
+                                });
+                            });
+                        }
                     }
+                )*/
 
-                    navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-                        video.srcObject = stream;
-                        if (cameraName == "back") {
-                            backMediaStreamTrack = stream.getVideoTracks()[0];
-                        } else {
-                            frontMediaStreamTrack = stream.getVideoTracks()[0];
-                        }
-                        console.log(backMediaStreamTrack);
-                        console.log(frontMediaStreamTrack);
-                        console.log(stream);
-                        let playPromise = video.play();
-                        if (playPromise != undefined) {
-                            playPromise.then(_ =>
-                                video.play()
-                            );
-                        }
-
-                    });
-                }
-            });
-
-            });*/
+            );
         }
     </script>
 
