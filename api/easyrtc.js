@@ -5850,7 +5850,7 @@ var Easyrtc = function() {
           }
        }
     }
-
+    
     /** This method is used to trigger renegotiation, which is how you
      * you update change the properties of an existing connection (such as the
      * the bandwidth used. Before calling it, you modify your sdp filters
@@ -11815,7 +11815,7 @@ return new Easyrtc();
      *              });
      */
     easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, onFailure) {
-        
+             
         var gotMediaCallback = null,
             gotConnectionCallback = null;
 
@@ -11886,7 +11886,7 @@ return new Easyrtc();
 
         var stream = easyrtc.getLocalStream(null);
         if (stream) {
-            postGetUserMedia();
+          postGetUserMedia();
         }
         else {
             easyrtc.initMediaSource(

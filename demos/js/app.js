@@ -31,7 +31,9 @@ var fileSender = null;
 var fileInput,
 	fileNames = new Array('');
 var drawer;
-var backTrack;
+var counter = 0;
+var frontTrackAppleDevice;
+var isApple = false;
 
 function buildPeerBlockName(easyrtcid) {
 	return 'peerzone_' + easyrtcid;
@@ -60,6 +62,40 @@ function blobToFile(theBlob, fileName) {
 	return theBlob;
 }
 
+//
+// this private method handles adding a stream to a peer connection.
+// chrome only supports adding streams, safari only supports adding
+// tracks.
+//
+function addStreamToPeerConnection(stream, peerConnection) {
+	alert(stream);
+	if (!isApple) {
+		var existingStreams = peerConnection.getLocalStreams();
+		if (existingStreams.indexOf(stream) === -1) {
+			peerConnection.addStream(stream);
+		}
+	} else {
+		var existingTracks = peerConnection.getSenders();
+		alert(JSON.stringify(existingTracks));
+		var tracks = stream.getAudioTracks();
+		alert(tracks);
+		var i;
+		for (i = 0; i < tracks.length; i++) {
+			if (existingTracks.indexOf(tracks[i]) === -1) {
+				peerConnection.addTrack(tracks[i]);
+				alert(i);
+			}
+		}
+		tracks = stream.getVideoTracks();
+		for (i = 0; i < tracks.length; i++) {
+			if (existingTracks.indexOf(tracks[i]) === -1) {
+				peerConnection.addTrack(tracks[i]);
+				alert(i);
+			}
+		}
+	}
+}
+
 /*SIDEBAR İÇİN FONKSİYONLAR */
 function openNav() {
 	document.getElementById('mySidenav').style.width = '330px';
@@ -82,6 +118,12 @@ function detectmob() {
 	}
 }
 
+function checkIfApple() {
+	if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+		isApple = true;
+	}
+}
+
 function checkDeviceAndOrganizeButtons() {
 	if (detectmob()) {
 		$('#desktop-buttons').remove();
@@ -100,6 +142,11 @@ function checkDeviceAndOrganizeButtons() {
 function connect() {
 	checkDeviceAndOrganizeButtons();
 
+	checkIfApple();
+
+	if (isApple) {
+		$('#selfVideo').css({ visibility: 'hidden' });
+	}
 	var previousOrientation = window.orientation;
 
 	var checkOrientation = function() {
@@ -112,7 +159,6 @@ function connect() {
 					});
 				}
 			} else {
-				console.log('döndükten sonra');
 				if (window.orientation != -previousOrientation) {
 					$('#selfVideo').css({
 						width: window.innerWidth * 0.45,
@@ -127,14 +173,7 @@ function connect() {
 	window.addEventListener('resize', checkOrientation, false);
 	window.addEventListener('orientationchange', checkOrientation, false);
 	setInterval(checkOrientation, 2000);
-	setInterval(checkSrcObject, 5000);
 
-	function checkSrcObject(){
-		if (document.getElementById('selfVideo').srcObject != undefined && backTrack == undefined){
-			alert('im here')
-			modal_PhotoTaker();
-		}
-	}
 	easyrtc.enableDataChannels(true);
 
 	easyrtc.setRoomOccupantListener(convertListToButtons);
@@ -156,7 +195,6 @@ function connect() {
 	//easyrtc.connect('easyrtc.dataFileTransfer', loginSuccess, loginFailure);
 	//easyrtc.easyApp('easyrtc.dataFileTransfer', 'selfVideo', [ 'callerVideo' ], loginSuccess, loginFailure);
 	easyrtc.easyApp('easyrtc.videoChatHd', 'selfVideo', [ 'callerVideo' ], loginSuccess, loginFailure);
-
 }
 
 function disconnect() {
@@ -253,7 +291,7 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 			}
 		}
 
-		$('#seperator').bind('DOMSubtreeModified', function(event) {
+		$('#takenPhotosInsideDiv').bind('DOMSubtreeModified', function(event) {
 			let filesList = new Array(File);
 			filesList.areBinary = true;
 			filesList[0] = blobToFile(bloby);
@@ -458,13 +496,13 @@ function touchUpOnPhoto(src, name) {
 	drawer = document.getElementById('touchUpCanvasForDrawing');
 	var ctx = drawer.getContext('2d');
 	photoToEdit.onload = function() {
-		const scale = $(window).height() * 100 / this.width;
-		this.width = $(window).height();
-		this.height = this.height * (scale / 100);
+		const scale = 700 / this.width;
+		this.width = 700; // 2341 => 500
+		this.height = this.height * scale;
 
 		$(drawer).drawr({
 			enable_tranparency: false,
-			canvas_width: this.width + 100,
+			canvas_width: this.width,
 			canvas_height: this.height,
 			undo_max_levels: 100
 		});
@@ -523,6 +561,35 @@ function loginSuccess(easyrtcid) {
 	selfEasyrtcid = easyrtcid;
 	easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
 
+	if (!isApple) {
+		modal_PhotoTaker();
+	} else {
+		navigator.mediaDevices
+			.getUserMedia({
+				video: {
+					facingMode: 'environment'
+				},
+				audio: true
+			})
+			.then(function(stream) {
+				let defaultStream = $('#selfVideo')[0].srcObject;
+				let videoTracks = defaultStream.getVideoTracks();
+				let audioTracks = defaultStream.getAudioTracks();
+				videoTracks.forEach((t) => {
+					t.enabled = false;
+				});
+				audioTracks.forEach((t) => {
+					t.enabled = false;
+				});
+				defaultStream.addTrack(stream.getVideoTracks()[0]);
+				backMediaStreamTrack = stream.getVideoTracks()[0];
+				defaultStream.addTrack(stream.getAudioTracks()[0]);
+				$('#selfVideo')[0].srcObject = stream;
+				$('#selfVideo').removeClass('easyrtcMirror');
+				$('#selfVideo').css({ visibility: 'visible' });
+			});
+	}
+
 	// bu kısımda masaüstü kullanıcımızın görüntüsünün karşıya gitmesi engelleniyor.
 	if (
 		navigator.userAgent.indexOf('Windows') != -1 ||
@@ -550,27 +617,69 @@ function loginFailure(errorCode, message) {
 
 // Aşağıdaki kodlar telefonu tutan kişinin arka kamerasıyla fotoğraf çekebilmesi ve görüntülü konuşmada kamera değiştirilebilmesi içindir;
 
-function changeCamera(curr) {
-	alert('youre literally trying to change cameras and ill not let you do that.');
+function changeCamera() {
+	let track;
 	let stream = $('#selfVideo')[0].srcObject;
 	let tracks = stream.getVideoTracks();
 	if (currentCameraState == 'front') {
+		/*if (isApple) {
+			navigator.mediaDevices
+				.getUserMedia({
+					video: {
+						facingMode: 'environment'
+					},
+					audio: true
+				})
+				.then((backStream) => {
+					//var existingTracks = peerConnection.getSenders();
+					var peerConnection = easyrtc.getPeerConnectionByUserId(theirID);
+					alert("before:" + peerConnection.getSenders().length);
+					stream.getVideoTracks().forEach(t => {
+						t.enabled = false;
+					})
+					stream.getAudioTracks().forEach(t => {
+						t.enabled = false;
+					})
+					stream.addTrack(backStream.getVideoTracks()[0]);
+					stream.addTrack(backStream.getAudioTracks()[0]);
+					
+					//addStreamToPeerConnection(backStream, easyrtc.getPeerConnectionByUserId(theirID))
+					alert("after:" + peerConnection.getSenders().length);
+
+					existingTracks.forEach(t => {
+						t.removeTrack();
+						stream.addTrack = backStream.getVideoTracks()[0];
+					})
+					$('#selfVideo')[0].srcObject = backStream;
+					easyrtc.renegotiate(theirID);
+				})
+				.catch((err) => {
+					alert(err);
+				})
+				.then(() => {
+					
+					//easyrtc.renegotiate(theirID);
+				});
+		} else {*/
 		document.getElementById('camera-source').innerHTML = 'camera_front';
 		tracks.map((t) => {
 			stream.removeTrack(t);
+			$('#selfVideo').removeClass('easyrtcMirror');
 			stream.addTrack(backMediaStreamTrack);
 		});
-		$('#selfVideo').removeClass('easyrtcMirror');
-		easyrtc.renegotiate(theirID);
+
 		currentCameraState = 'back';
 	} else {
+		/*if (isApple) {
+			stream.addTrack(frontTrackAppleDevice);
+		} else {*/
 		document.getElementById('camera-source').innerHTML = 'camera_rear';
 
 		tracks.map((t) => {
 			stream.removeTrack(t);
+			$('#selfVideo').addClass('easyrtcMirror');
 			stream.addTrack(frontMediaStreamTrack);
 		});
-		$('#selfVideo').addClass('easyrtcMirror');
 		easyrtc.renegotiate(theirID);
 		currentCameraState = 'front';
 	}
@@ -580,41 +689,33 @@ function connectFailure(err) {
 	alert(err);
 }
 
-function take_photo() {
-	const constraints = {
-		video: {
-			deviceId: backCameraID
-				? {
-						exact: backCameraID
-					}
-				: undefined
-		},
-		audio: false
-	};
-}
-
 function gotMedia() {
-	console.log(backMediaStreamTrack);
-	const imageCapture = new ImageCapture(backMediaStreamTrack);
+	alert('here 1');
+	let imageCapture;
+
+	imageCapture = new ImageCapture(backMediaStreamTrack);
+
 	const img = document.createElement('img');
+	alert('here 2');
 
 	imageCapture
 		.takePhoto()
 		.then((blob) => {
-			sleep(1000);
+			alert('here 3');
+
+			sleep(500);
 			img.setAttribute('src', URL.createObjectURL(blob));
-			img.setAttribute('width', '30%');
+			img.setAttribute('width', '45%');
 			$(img).addClass('rotateimg90');
 			console.log(blob);
 			bloby = blob;
-			document.getElementById('seperator').appendChild(img);
+			document.getElementById('takenPhotosInsideDiv').appendChild(img);
+			alert('here 4');
 
 			//document.
 		})
 		.catch((error) => {
 			alert(error);
-			console.log(error);
-			easyrtc.renegotiate(theirID);
 		});
 	console.log('END-----------------------------------------');
 }
