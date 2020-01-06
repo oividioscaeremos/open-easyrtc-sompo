@@ -180,6 +180,7 @@ function connect() {
 
 	easyrtc.setDataChannelOpenListener(function(easyrtcid, usesPeer) {
 		var obj = document.getElementById(buildDragNDropName(easyrtcid));
+		console.log(buildDragNDropName(easyrtcid));
 		if (!obj) {
 			console.log('no such object ');
 		}
@@ -278,21 +279,32 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 			// and on completion, send the files. Otherwise send the files now.
 			var timer = null;
 			if (easyrtc.getConnectStatus(easyrtcid) === easyrtc.NOT_CONNECTED && noDCs[easyrtcid] === undefined) {
+				console.log("here1");
 				//
 				// calls between firefrox and chrome ( version 30) have problems one way if you
 				// use data channels.
 				//
 			} else if (easyrtc.getConnectStatus(easyrtcid) === easyrtc.IS_CONNECTED || noDCs[easyrtcid]) {
+				console.log("here2");
+
 				if (!fileSender) {
+					console.log("here3");
+
 					fileSender = easyrtc_ft.buildFileSender(easyrtcid, updateStatusDiv);
 				}
-				fileSender(files, true /* assume binary */);
+				console.log("here4");
+				try{
+					fileSender(files, true /* assume binary */ );
+				}catch(err){
+					console.log("error files handler : "+ err);
+				}
+
 			} else {
 				easyrtc.showError('user-error', 'Wait for the connection to complete before adding more files!');
 			}
 		}
 
-		$('#takenPhotosInsideDiv').bind('DOMSubtreeModified', function(event) {
+		$('#takenPhotosInsideDiv').bind('DOMSubtreeModified', function() {
 			let filesList = new Array(File);
 			filesList.areBinary = true;
 			filesList[0] = blobToFile(bloby);
@@ -323,11 +335,9 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 				button.onclick = (function(easyrtcid) {
 					return function() {
 						performCall(easyrtcid);
-						if (!detectmob()) {
-							easyrtc.setOnHangup(function(easyrtcid, slot) {
-								document.getElementById('start-call').disabled = true;
-							});
-						}
+						easyrtc.setOnHangup(function(easyrtcid, slot) {
+							document.getElementById('start-call').disabled = true;
+						});
 					};
 				})(easyrtcid);
 			}
@@ -343,7 +353,7 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 }
 
 function acceptRejectCB(otherGuy, fileNameList, wasAccepted) {
-	console.log(otherGuy);
+	console.log("otherGuy");
 	var receiveBlock = document.getElementById(buildReceiveAreaName(otherGuy));
 	jQuery(receiveBlock).empty();
 	receiveBlock.style.display = 'inline-block';

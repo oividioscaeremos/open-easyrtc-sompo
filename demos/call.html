@@ -24,6 +24,7 @@
 </head>
 
 <body onload="connect()">
+    <div id="peerZone" style="width: 100%; height: 20%; margin-top: 0px;"></div>
     <div id="mySidenav" class="sidenav drawr-container">
         <div style="text-align: center;">
             <img src="http://www.ilkeratabay.com/wp-content/uploads/2019/11/90derece.png" height="32" width="32"
@@ -65,59 +66,58 @@
             <a id="selfDownloadLink"></a>
             <a id="callerDownloadLink"></a>
         </div>
-        <div id="peerZone" style="width: 100%; height: 20%; margin-top: 0px;">
-        </div>
-        <div id="seperator" /><br><br>
+    </div>
+    <div id="seperator" /><br><br>
 
-        <div class="container" style="width:100%; height:100%;" style="background-color: red;">
-            <div class="row md-center" id="cameras" style="background-color: #6e1313;">
-                <video autoplay="autoplay" playsinline="playsinline" id="selfVideo" class="easyrtcMirror"
-                    style="top: 0px; position:absolute;" muted></video>
-                <video autoplay="autoplay" playsinline="playsinline" id="callerVideo" muted></video>
+    <div class="container" style="width:100%; height:100%;" style="background-color: red;">
+        <div class="row md-center" id="cameras" style="background-color: #6e1313;">
+            <video autoplay="autoplay" playsinline="playsinline" id="selfVideo" class="easyrtcMirror"
+                style="top: 0px; position:absolute;" muted></video>
+            <video autoplay="autoplay" playsinline="playsinline" id="callerVideo" muted></video>
+        </div>
+        <!-- Fotoğraf Çekmek İçin Kullanılacak Olan Modal (Mobil Tarafta)-->
+        <div id="takePhotoModal" class="modal" style="z-index: 99;">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <span class="divider">&nbsp;</span>
+                    <h5>Sompo Sigorta - Canlı Destek</h5>
+                </div>
+                <div class="modal-body">
+                    <video id="video" style="margin: 0 auto; width: 100%; height: auto;" autoplay muted></video>
+                    <div><button id='take-a-photo' onclick="gotMedia()">Fotoğraf Çek</button></div>
+                </div>
             </div>
-            <!-- Fotoğraf Çekmek İçin Kullanılacak Olan Modal (Mobil Tarafta)-->
-            <div id="takePhotoModal" class="modal" style="z-index: 99;">
-                <!-- Modal content -->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <span class="close">&times;</span>
-                        <span class="divider">&nbsp;</span>
-                        <h5>Sompo Sigorta - Canlı Destek</h5>
+        </div>
+        <!-- Fotoğraf Çekmek İçin Kullanılacak Modal Sonu -->
+
+        <!-- Müşterinin Çektiği Fotoğrafları Görmesi İçin Kullanılacak Olan Modal (Mobil Tarafta)-->
+        <div id="takenPhotos" class="modal" style="z-index: 99;">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <span class="divider">&nbsp;</span>
+                    <h5>Sompo Sigorta <br> &nbsp; Canlı Destek</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
+                        Çektiğiniz fotoğraflar aşağıda gösterilecektir.
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <div class="modal-body">
-                        <video id="video" style="margin: 0 auto; width: 100%; height: auto;" autoplay muted></video>
-                        <div><button id='take-a-photo' onclick="gotMedia()">Fotoğraf Çek</button></div>
+                    <div id="takenPhotosInsideDiv">
+                        &nbsp;
                     </div>
                 </div>
             </div>
-            <!-- Fotoğraf Çekmek İçin Kullanılacak Modal Sonu -->
-
-            <!-- Müşterinin Çektiği Fotoğrafları Görmesi İçin Kullanılacak Olan Modal (Mobil Tarafta)-->
-            <div id="takenPhotos" class="modal" style="z-index: 99;">
-                <!-- Modal content -->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <span class="close">&times;</span>
-                        <span class="divider">&nbsp;</span>
-                        <h5>Sompo Sigorta <br> &nbsp; Canlı Destek</h5>
-                    </div>
-                    <div class="modal-body">
-                        <div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
-                            Çektiğiniz fotoğraflar aşağıda gösterilecektir.
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div id="takenPhotosInsideDiv">
-                            &nbsp;
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Müşterinin Çektiği Fotoğrafları Görmesi İçin Kullanılacak Modal Sonu -->
         </div>
+        <!-- Müşterinin Çektiği Fotoğrafları Görmesi İçin Kullanılacak Modal Sonu -->
+    </div>
 
-        <div id="otherClients"></div>
+    <div id="otherClients"></div>
     </div>
     </div>
     <script type="text/javascript" src="js/drawr.js"></script>
@@ -204,6 +204,8 @@
                                 if (v.kind == "videoinput") {
                                     if (v.kind == "videoinput" && v.label.toLocaleLowerCase('tr').match(
                                             /arka|back/g) != null) {
+                                        console.log("v");
+                                        console.log(v);
                                         cameraList[0].push(v);
                                     } else if (v.kind == "videoinput" && v.label.toLocaleLowerCase('tr')
                                         .match(/ön|front/g) != null) {
@@ -242,7 +244,9 @@
 
                                 });
                             }
-                        } else if (cameraList[0] !== undefined) {
+                        } else if (cameraList[0] !== undefined && cameraList[0][0] != undefined) {
+                            console.log("cameralist[0][0]");
+                            console.log(cameraList);
                             constraints = {
                                 video: {
                                     deviceId: cameraList[0][0].deviceId
