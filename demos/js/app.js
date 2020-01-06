@@ -576,6 +576,7 @@ function loginSuccess(easyrtcid) {
 
 	if (!isApple) {
 		modal_PhotoTaker();
+		easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
 	} else {
 		navigator.mediaDevices
 			.getUserMedia({
