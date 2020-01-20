@@ -150,11 +150,11 @@ function connect() {
 		$('#selfVideo').css({ visibility: 'hidden' });
 	}
 
-	/*$('#stream-high-canvas').css({
+	$('#stream-high-canvas').css({
 		left: '-9999999px',
 		top: '-999999px',
 		position: 'absolute'
-	});*/
+	});
 
 	var previousOrientation = window.orientation;
 
@@ -516,8 +516,8 @@ function touchUpOnPhoto(src, name) {
 	drawer = document.getElementById('touchUpCanvasForDrawing');
 	var ctx = drawer.getContext('2d');
 	photoToEdit.onload = function() {
-		console.log("this.width, this.height");
-		console.log(this.width + "," + this.height);
+		console.log('this.width, this.height');
+		console.log(this.width + ',' + this.height);
 		const scale = 700 / this.width;
 		this.width = 700; // 2341 => 700
 		this.height = this.height * scale;
@@ -551,9 +551,9 @@ function touchUpOnPhoto(src, name) {
 	photoToEdit.src = src;
 }
 
-function drawerSave(){
+function drawerSave() {
 	let drawerCurrent = document.getElementById('touchUpCanvasForDrawing');
-	drawerCurrent.toBlob(function (blob) {
+	drawerCurrent.toBlob(function(blob) {
 		console.log('here!');
 		if ((name = latestBlobName)) {
 			easyrtc_ft.saveAs(blob, name.split('.')[1] + '_CHANGED');
@@ -703,8 +703,8 @@ function gotMedia() {
 		let newCanvas = document.createElement('canvas');
 		newCanvas.width = backStreamWidth;
 		newCanvas.height = backStreamHeight;
-		console.log("backStreamWidth");
-		console.log(backStreamWidth + "," + backStreamHeight);
+		console.log('backStreamWidth');
+		console.log(backStreamWidth + ',' + backStreamHeight);
 
 		let canvasContext = newCanvas.getContext('2d');
 
