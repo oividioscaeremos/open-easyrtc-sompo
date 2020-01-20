@@ -25,7 +25,8 @@
 //
 var selfEasyrtcid = '';
 var peers = {};
-let currentCameraState = 'front';
+let currentCameraState = 'front',
+	latestBlobName = '';
 var bloby = new Blob();
 var fileSender = null;
 var fileInput,
@@ -34,6 +35,7 @@ var drawer;
 var counter = 0;
 var frontTrackAppleDevice;
 var isApple = false;
+var backMediaStream;
 
 function buildPeerBlockName(easyrtcid) {
 	return 'peerzone_' + easyrtcid;
@@ -147,6 +149,13 @@ function connect() {
 	if (isApple) {
 		$('#selfVideo').css({ visibility: 'hidden' });
 	}
+
+	/*$('#stream-high-canvas').css({
+		left: '-9999999px',
+		top: '-999999px',
+		position: 'absolute'
+	});*/
+
 	var previousOrientation = window.orientation;
 
 	var checkOrientation = function() {
@@ -279,26 +288,25 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 			// and on completion, send the files. Otherwise send the files now.
 			var timer = null;
 			if (easyrtc.getConnectStatus(easyrtcid) === easyrtc.NOT_CONNECTED && noDCs[easyrtcid] === undefined) {
-				console.log("here1");
+				console.log('here1');
 				//
 				// calls between firefrox and chrome ( version 30) have problems one way if you
 				// use data channels.
 				//
 			} else if (easyrtc.getConnectStatus(easyrtcid) === easyrtc.IS_CONNECTED || noDCs[easyrtcid]) {
-				console.log("here2");
+				console.log('here2');
 
 				if (!fileSender) {
-					console.log("here3");
+					console.log('here3');
 
 					fileSender = easyrtc_ft.buildFileSender(easyrtcid, updateStatusDiv);
 				}
-				console.log("here4");
-				try{
-					fileSender(files, true /* assume binary */ );
-				}catch(err){
-					console.log("error files handler : "+ err);
+				console.log('here4');
+				try {
+					fileSender(files, true /* assume binary */);
+				} catch (err) {
+					console.log('error files handler : ' + err);
 				}
-
 			} else {
 				easyrtc.showError('user-error', 'Wait for the connection to complete before adding more files!');
 			}
@@ -353,7 +361,7 @@ function convertListToButtons(roomName, occupants, isPrimary) {
 }
 
 function acceptRejectCB(otherGuy, fileNameList, wasAccepted) {
-	console.log("otherGuy");
+	console.log('otherGuy');
 	var receiveBlock = document.getElementById(buildReceiveAreaName(otherGuy));
 	jQuery(receiveBlock).empty();
 	receiveBlock.style.display = 'inline-block';
@@ -503,12 +511,15 @@ $('#rotater').on('click', function() {
 
 function touchUpOnPhoto(src, name) {
 	openNav();
+	latestBlobName = name;
 	var photoToEdit = new Image();
 	drawer = document.getElementById('touchUpCanvasForDrawing');
 	var ctx = drawer.getContext('2d');
 	photoToEdit.onload = function() {
+		console.log("this.width, this.height");
+		console.log(this.width + "," + this.height);
 		const scale = 700 / this.width;
-		this.width = 700; // 2341 => 500
+		this.width = 700; // 2341 => 700
 		this.height = this.height * scale;
 
 		$(drawer).drawr({
@@ -531,24 +542,27 @@ function touchUpOnPhoto(src, name) {
 
 		document.getElementById('mySidenav').style.width = this.width + 80 + 'px';
 		document.getElementById('wholeContent').style.marginLeft = this.width + 80 + 'px';
+
 		$('#drawr-container').css({
 			width: this.width,
 			height: this.height
 		});
 	};
-
-	$('#saveChanges').on('click', function() {
-		// fotoğraf üzerinde değişimler bittikten sonra fotoğrafı kaydedeceğiz.
-		console.log(name);
-		drawer.toBlob(function(blob) {
-			easyrtc_ft.saveAs(blob, name.split('.')[1] + '_CHANGED' + name.split('.')[2]);
-		});
-
-		drawer.undoStack = [];
-
-		closeNav();
-	});
 	photoToEdit.src = src;
+}
+
+function drawerSave(){
+	let drawerCurrent = document.getElementById('touchUpCanvasForDrawing');
+	drawerCurrent.toBlob(function (blob) {
+		console.log('here!');
+		if ((name = latestBlobName)) {
+			easyrtc_ft.saveAs(blob, name.split('.')[1] + '_CHANGED');
+		}
+	});
+
+	drawer.undoStack = [];
+
+	closeNav();
 }
 
 function blobAcceptor(otherGuy, blob, filename) {
@@ -563,7 +577,7 @@ function blobAcceptor(otherGuy, blob, filename) {
 	let image = document.createElement('img');
 	image.setAttribute('src', URL.createObjectURL(blob));
 	$(image).addClass('rotateimg90');
-	image.setAttribute('width', '10%');
+	image.setAttribute('width', '150px');
 	image.setAttribute('height', 'auto');
 	image.addEventListener('click', function() {
 		touchUpOnPhoto(image.src, filename);
@@ -605,6 +619,16 @@ function loginSuccess(easyrtcid) {
 			})
 			.then(() => {
 				easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
+				if (detectmob) {
+					let backStreamWidth = backMediaStreamTrack.getCapabilities().width.max;
+					let backStreamHeight = backMediaStreamTrack.getCapabilities().height.max;
+
+					$('#stream-high-canvas').css({
+						width: backStreamWidth,
+						height: backStreamHeight
+					});
+					document.getElementById('stream-high-canvas').srcObject = backMediaStreamTrack;
+				}
 			});
 	}
 
@@ -669,31 +693,25 @@ function connectFailure(err) {
 }
 
 function gotMedia() {
-	if (isApple) {
+	if (!isApple) {
 		let backStreamWidth = backMediaStreamTrack.getCapabilities().width.max;
 		let backStreamHeight = backMediaStreamTrack.getCapabilities().height.max;
 		console.log('ım right here bıatch');
 
 		const image = document.createElement('img');
-		let newVideoElement = document.createElement('video');
+		let videoElement = document.getElementById('stream-high-canvas');
 		let newCanvas = document.createElement('canvas');
+		newCanvas.width = backStreamWidth;
+		newCanvas.height = backStreamHeight;
+		console.log("backStreamWidth");
+		console.log(backStreamWidth + "," + backStreamHeight);
+
 		let canvasContext = newCanvas.getContext('2d');
 
-		newCanvas.height = backStreamHeight;
-		newVideoElement.width = backStreamWidth;
-		newVideoElement.height = backStreamHeight;
-		$(newVideoElement).css({
-			left: '-9999999px',
-			top: '-999999px',
-			position: 'absolute'
-		});
-		document.body.appendChild(newVideoElement);
-		document.body.appendChild(newCanvas);
-		newVideoElement.srcObject = $('#selfVideo')[0].srcObject;
-		canvasContext.drawImage(newVideoElement, 0, 0);
+		canvasContext.drawImage(videoElement, 0, 0, backStreamWidth, backStreamHeight);
 		newCanvas.toBlob(function(blob) {
 			image.setAttribute('src', URL.createObjectURL(blob));
-			image.setAttribute('width', '45%');
+			image.setAttribute('width', '125px');
 			$(image).addClass('rotateimg90');
 			bloby = blob;
 			console.log(blob);
