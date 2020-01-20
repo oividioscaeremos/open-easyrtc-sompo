@@ -274,8 +274,8 @@
                                         .getCapabilities().height
                                         .max;
                                     $('#stream-high-canvas').css({
-                                        width: backStreamWidth,
-                                        height: backStreamHeight
+                                        width: backStreamWidth / 2,
+                                        height: backStreamHeight / 2
                                     });
                                     $('#stream-high-canvas')[0].srcObject =
                                         backMediaStream;

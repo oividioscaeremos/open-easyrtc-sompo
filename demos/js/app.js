@@ -694,9 +694,8 @@ function connectFailure(err) {
 
 function gotMedia() {
 	if (!isApple) {
-		let backStreamWidth = backMediaStreamTrack.getCapabilities().width.max;
-		let backStreamHeight = backMediaStreamTrack.getCapabilities().height.max;
-		console.log('ım right here bıatch');
+		let backStreamWidth = backMediaStreamTrack.getCapabilities().width.max/2;
+		let backStreamHeight = backMediaStreamTrack.getCapabilities().height.max/2;
 
 		const image = document.createElement('img');
 		let videoElement = document.getElementById('stream-high-canvas');
