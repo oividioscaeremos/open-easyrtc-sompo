@@ -573,7 +573,7 @@ function blobAcceptor(otherGuy, blob, filename) {
 	}
 	console.log('passed the if');
 	fileNames.push(filename);
-	//easyrtc_ft.saveAs(blob, filename); // fotoğrafı direkt olarak indirmek için kullanılan satır.
+	easyrtc_ft.saveAs(blob, filename); // fotoğrafı direkt olarak indirmek için kullanılan satır.
 	let image = document.createElement('img');
 	image.setAttribute('src', URL.createObjectURL(blob));
 	$(image).addClass('rotateimg90');
@@ -693,29 +693,33 @@ function connectFailure(err) {
 }
 
 function gotMedia() {
-	if (!isApple) {
-		let backStreamWidth = backMediaStreamTrack.getCapabilities().width.max/2;
-		let backStreamHeight = backMediaStreamTrack.getCapabilities().height.max/2;
+	let backStreamWidthTwo = backMediaStreamTrack.getCapabilities().height.max / 2;
+	let backStreamHeightTwo = backMediaStreamTrack.getCapabilities().width.max / 2;
 
-		const image = document.createElement('img');
-		let videoElement = document.getElementById('stream-high-canvas');
-		let newCanvas = document.createElement('canvas');
-		newCanvas.width = backStreamWidth;
-		newCanvas.height = backStreamHeight;
-		console.log('backStreamWidth');
-		console.log(backStreamWidth + ',' + backStreamHeight);
+	const image = document.createElement('img');
+	let videoElement = document.getElementById('stream-high-canvas');
+	let newCanvas = document.createElement('canvas');
 
-		let canvasContext = newCanvas.getContext('2d');
+	console.log(backMediaStreamTrack.getCapabilities());
+	console.log(backStreamWidthTwo + ' and ' + backStreamHeightTwo);
+	newCanvas.width = backStreamWidthTwo;
+	newCanvas.height = backStreamHeightTwo;
 
-		canvasContext.drawImage(videoElement, 0, 0, backStreamWidth, backStreamHeight);
-		newCanvas.toBlob(function(blob) {
-			image.setAttribute('src', URL.createObjectURL(blob));
-			image.setAttribute('width', '125px');
-			$(image).addClass('rotateimg90');
-			bloby = blob;
-			console.log(blob);
-			document.getElementById('takenPhotosInsideDiv').appendChild(image);
-		});
+	let canvasContext = newCanvas.getContext('2d');
+	//document.body.appendChild(newCanvas);
+
+	canvasContext.drawImage(videoElement, 0, 0, backStreamWidthTwo, backStreamHeightTwo);
+
+	newCanvas.toBlob(function(blob) {
+		image.setAttribute('src', URL.createObjectURL(blob));
+		image.setAttribute('width', '150px');
+		//$(image).addClass('rotateimg90');
+		bloby = blob;
+		console.log(blob);
+		document.getElementById('takenPhotosInsideDiv').appendChild(image);
+	});
+	/*if (!isApple) {
+		
 	} else {
 		let imageCapture;
 		try {
@@ -740,7 +744,7 @@ function gotMedia() {
 			.catch((error) => {
 				alert(error);
 			});
-	}
+	}*/
 }
 
 /* KAYIT (RECORDING) İŞLEMİ İÇİN BLOK BAŞLANGIÇ*/
