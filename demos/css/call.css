@@ -31,6 +31,12 @@ body {
 	transform: scaleX(-1);
 }
 
+#content-getDownloadLinks {
+	top: 40%;
+	width: 30%;
+}
+
+
 /* The Modal (background) */
 .modal {
 	z-index: 3;

@@ -41,34 +41,32 @@
             <button id="saveChanges" onclick="drawerSave()">Kaydet</button>
         </div>
     </div>
+    <div class="navbar" id="navbarButtons">
+        <div id="mobile-buttons" style="visibility:hidden;">
+            <button id="change-camera-source" class=" btn btn-light"><i id="camera-source" class="material-icons">
+                    camera_rear
+                </i></button>
+            <button id="takePhotoBtn" class=" btn btn-light"><i class="material-icons">
+                    add_a_photo
+                </i></button>
+            <button id="photos" class=" btn btn-light" onclick="showTakenPhotosModal()"><i class="material-icons">
+                    collections
+                </i></button>
+        </div>
+        <div id="desktop-buttons" style="visibility:hidden;">
+            <button id="start-call" class=" btn btn-light" onclick="performCall(theirID);" disabled>ARAMAYI
+                BAŞLAT</button>
+            <button id="end-call" class=" btn btn-light" onclick="disconnect();">ARAMAYI BİTİR</button>
+            <button id="startRecording" class=" btn btn-light" onclick="startRecording();">KAYDI
+                BAŞLAT</button>
+            <button id="stopRecording" class=" btn btn-light" onclick="endRecording();" disabled>KAYDI
+                BİTİR</button>
+            <button class=" btn btn-light" id="btnGetDownloadLinks" disabled>İNDİRME
+                LİNKİNİ AL</button>
+        </div>
+    </div>
     <div id="wholeContent">
         <div id="peerZone" style="width: 100%; height: 20%; margin-top: 0px;"></div>
-        <div class="navbar">
-            <div id="mobile-buttons" style="visibility:hidden;">
-                <button id="change-camera-source" class=" btn btn-light"><i id="camera-source" class="material-icons">
-                        camera_rear
-                    </i></button>
-                <button id="takePhotoBtn" class=" btn btn-light"><i class="material-icons">
-                        add_a_photo
-                    </i></button>
-                <button id="photos" class=" btn btn-light" onclick="showTakenPhotosModal()"><i class="material-icons">
-                        collections
-                    </i></button>
-            </div>
-            <div id="desktop-buttons" style="visibility:hidden;">
-                <button id="start-call" class=" btn btn-light" onclick="performCall(theirID);" disabled>ARAMAYI
-                    BAŞLAT</button>
-                <button id="end-call" class=" btn btn-light" onclick="disconnect();">ARAMAYI BİTİR</button>
-                <button id="startRecording" class=" btn btn-light" onclick="startRecording();">KAYDI
-                    BAŞLAT</button>
-                <button id="stopRecording" class=" btn btn-light" onclick="endRecording();">KAYDI
-                    BİTİR</button>
-                <button class=" btn btn-light" onclick="getDownloadLinksForCall();">İNDİRME
-                    LİNKİNİ AL</button>
-            </div>
-            <a id="selfDownloadLink"></a>
-            <a id="callerDownloadLink"></a>
-        </div>
         <div class="container" style="width:100%; height:100%;" style="background-color: red;">
             <div class="row md-center" id="cameras" style="background-color: #6e1313;">
                 <video autoplay="autoplay" playsinline="playsinline" id="selfVideo" class="easyrtcMirror"
@@ -91,6 +89,26 @@
                 </div>
             </div>
             <!-- Fotoğraf Çekmek İçin Kullanılacak Modal Sonu -->
+
+            <!-- İndirme linklerinin gösterileceği modal-->
+            <div id="getDownloadLinks" class="modal" style="z-index: 99;">
+                <!-- Modal content -->
+                <div id="content-getDownloadLinks" class="modal-content">
+                    <div class="modal-header">
+                        <span class="close">&times;</span>
+                        <span class="divider">&nbsp;</span>
+                        <h5>Sompo Sigorta - Canlı Destek</h5>
+                    </div>
+                    <div class="modal-body">
+                        Görüşmenin indirme linklerini aşağıdan indirebilirsiniz.
+                        <br>
+                        <a id="selfDownloadLink">Sizin görüşme kaydınız.</a>
+                        <br>
+                        <a id="callerDownloadLink">Karşı tarafın görüşme kaydı.</a>
+                    </div>
+                </div>
+            </div>
+            <!-- İndirme linklerinin gösterileceği modal sonu -->
 
             <!-- Müşterinin Çektiği Fotoğrafları Görmesi İçin Kullanılacak Olan Modal (Mobil Tarafta)-->
             <div id="takenPhotos" class="modal" style="z-index: 99;">
@@ -147,15 +165,18 @@
         // Get the modal
         var takePhotoModal = document.getElementById("takePhotoModal");
         var seePhotosModal = document.getElementById("takenPhotos");
+        var getDownloadLinksModal = document.getElementById("getDownloadLinks");
 
 
         // Get the button that opens the modal
         var takePhotoBtn = document.getElementById("takePhotoBtn");
         var seePhotosBtn = document.getElementById("photos");
+        var getDownloadLinksBtn = document.getElementById("btnGetDownloadLinks");
 
         // Get the <span> element that closes the modal
         var spanTakePhoto = document.getElementsByClassName("close")[0];
         var spanSeePhoto = document.getElementsByClassName("close")[1];
+        var spanGetDownloadLinks = document.querySelector("#getDownloadLinks > div > div.modal-header > span.close");
 
         // When the user clicks the button, open the modal 
 
@@ -170,6 +191,10 @@
             seePhotosModal.style.display = "block";
         }
 
+        getDownloadLinksBtn.onclick = function () {
+            getDownloadLinksModal.style.display = "block";
+        }
+
         // When the user clicks on <span> (x), close the modal
         spanTakePhoto.onclick = function () {
             takePhotoModal.style.display = "none";
@@ -178,12 +203,18 @@
             seePhotosModal.style.display = "none";
         }
 
+        spanGetDownloadLinks.onclick = function () {
+            getDownloadLinksModal.style.display = "none";
+        }
+
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function (event) {
             if (event.target == takePhotoModal) {
                 takePhotoModal.style.display = "none";
             } else if (event.target == seePhotosModal) {
                 seePhotosModal.style.display = "none";
+            } else if (event.target == getDownloadLinksModal) {
+                getDownloadLinksModal.style.display = "none";
             }
         }
 

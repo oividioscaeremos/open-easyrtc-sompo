@@ -102,12 +102,14 @@ function addStreamToPeerConnection(stream, peerConnection) {
 function openNav() {
 	document.getElementById('mySidenav').style.width = '330px';
 	document.getElementById('wholeContent').style.marginLeft = '330px';
+	document.getElementById('navbarButtons').style.marginLeft = '330px';
 	$(drawer).drawr('destroy');
 }
 
 function closeNav() {
 	document.getElementById('mySidenav').style.width = '0';
 	document.getElementById('wholeContent').style.marginLeft = '0';
+	document.getElementById('navbarButtons').style.marginLeft = '0';
 	$(drawer).drawr('destroy');
 }
 /*SIDEBAR İÇİN FONKSİYONLAR */
@@ -566,12 +568,9 @@ function drawerSave() {
 }
 
 function blobAcceptor(otherGuy, blob, filename) {
-	console.log('++++++++++++++++++++++++++++++++++++++++++++++++');
-	console.log('blob acceptor');
 	if (fileNames.indexOf(filename) != -1) {
 		return;
 	}
-	console.log('passed the if');
 	fileNames.push(filename);
 	easyrtc_ft.saveAs(blob, filename); // fotoğrafı direkt olarak indirmek için kullanılan satır.
 	let image = document.createElement('img');
@@ -756,7 +755,7 @@ function startRecording() {
 	var selfLink = document.getElementById('selfDownloadLink');
 	selfLink.innerText = '';
 
-	selfRecorder = easyrtc.recordToFile(easyrtc.getLocalStream(), selfLink, 'selfVideo');
+	selfRecorder = easyrtc.recordToFile(easyrtc.getLocalStream(), selfLink, 'temsilci-kayit '+Date().toString());
 	if (selfRecorder) {
 		document.getElementById('startRecording').disabled = true;
 		document.getElementById('stopRecording').disabled = false;
@@ -774,7 +773,7 @@ function startRecording() {
 		callerRecorder = easyrtc.recordToFile(
 			easyrtc.getRemoteStream(easyrtc.getIthCaller(0), null),
 			callerLink,
-			'callerVideo'
+			'musteri-kayit ' + Date().toString()
 		);
 		if (!callerRecorder) {
 			window.alert(
@@ -795,6 +794,8 @@ function endRecording() {
 	}
 	document.getElementById('startRecording').disabled = false;
 	document.getElementById('stopRecording').disabled = true;
+	document.getElementById('btnGetDownloadLinks').disabled = false;
+
 }
 
 /* KAYIT (RECORDING) İŞLEMİ İÇİN BLOK BİTİŞ*/
